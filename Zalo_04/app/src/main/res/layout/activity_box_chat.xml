@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BoxChatActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@color/zalo_blue"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/img_find"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_back" />
+
+            <LinearLayout
+                android:layout_gravity="center"
+                android:layout_width="230dp"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="Pig"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:text="Truy cập 4 giờ trước"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!--<TextView
+                android:id="@+id/tv_find"
+                android:text="Tìm kiếm"
+                android:gravity="center_vertical"
+                android:textColor="@color/color_find"
+                android:textSize="16sp"
+                android:layout_width="280dp"
+                android:layout_height="match_parent"/>-->
+
+            <ImageView
+                android:id="@+id/img_call"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="15dp"
+                android:src="@drawable/ic_call" />
+
+            <ImageView
+                android:id="@+id/img_add"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="15dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_call_video" />
+
+            <ImageView
+                android:id="@+id/img_option"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_option" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

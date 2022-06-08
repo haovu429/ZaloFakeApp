@@ -2,9 +2,12 @@ package hcmute.edu.vn.zalo_04.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,8 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,21 +31,30 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.MainActivity;
 import hcmute.edu.vn.zalo_04.MessageActivity;
+import hcmute.edu.vn.zalo_04.MyInterface.IClickAddFriend;
 import hcmute.edu.vn.zalo_04.R;
 import hcmute.edu.vn.zalo_04.RegisterActivity;
+import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.model.User;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    private String currentUserId;
+
     private Context context;
     private List<User> userList;
     private boolean ischat;
-    DatabaseReference reference;
+    private DatabaseReference reference;
+    private String theLastMessage;
+    private boolean isfriend;
 
-    public UserAdapter(Context context, List<User> userList, boolean ischat) {
+    private IClickAddFriend iClickAddFriend;
+
+    public UserAdapter(Context context, List<User> userList, boolean ischat, boolean isfriend) {
         this.context = context;
         this.userList = userList;
         this.ischat = ischat;
+        this.isfriend = isfriend;
         notifyDataSetChanged();
     }
 
@@ -69,8 +86,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             Glide.with(context).load(user.getImageURL()).into(holder.profile_image);
         }
 
-        holder.username.setText(user.getUsername());
+        if (ischat){
+            lastMessage(user, holder.last_msg);
+        } else {
+            holder.last_msg.setVisibility(View.GONE);
+        }
 
+        holder.username.setText(user.getUsername());
 
         if (ischat){
             if(user.getStatus() != null){
@@ -104,6 +126,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             holder.img_offline.setVisibility(View.GONE);
         }
 
+        if (isfriend){
+            holder.img_friend.setVisibility(View.GONE);
+        } else {
+            holder.img_friend.setVisibility(View.VISIBLE);
+            holder.img_friend.setOnClickListener(View ->{
+                try {
+                    iClickAddFriend.clickAddFriend();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                addFriendList(user.getId());
+            });
+        }
+
         holder.itemView.setOnClickListener(View -> {
             Intent intent = new Intent(context, MessageActivity.class);
             intent.putExtra("userId", user.getId());
@@ -127,6 +163,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private TextView username;
         private CircleImageView img_online;
         private CircleImageView img_offline;
+        private TextView last_msg;
+        private ImageView img_friend;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -134,6 +172,105 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             username = (TextView) itemView.findViewById(R.id.username);
             img_online = (CircleImageView) itemView.findViewById(R.id.img_online);
             img_offline = (CircleImageView) itemView.findViewById(R.id.img_offline);
+            last_msg = (TextView) itemView.findViewById(R.id.last_message);
+            img_friend = (ImageView) itemView.findViewById(R.id.img_add_friend);
+
         }
+    }
+
+    //Check for last massage
+    private void lastMessage (User user, TextView last_msg){
+        String userId = user.getId();
+        theLastMessage = "default";
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for (DataSnapshot snapshot_index : snapshot.getChildren()){
+                    Chat chat = snapshot_index.getValue(Chat.class);
+                    if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
+                        theLastMessage = user.getUsername() + ": " + chat.getMessage();
+                    } else {
+                        if (chat.getReceiver().equals(userId) && chat.getSender().equals(firebaseUser.getUid())){
+                            theLastMessage = "Bạn: " + chat.getMessage();
+                        }
+                    }
+                }
+
+                switch (theLastMessage){
+                    case "default":
+                        last_msg.setText("No Message");
+                        break;
+                    default:
+                        last_msg.setText(theLastMessage);
+                        break;
+                }
+                theLastMessage = "default";
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void addFriendList(String added_userId){
+        //add user to message fragment
+        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("FriendList")
+                .child(currentUserId)
+                .child(added_userId);
+
+        chatRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+                    chatRef.child("id").setValue(added_userId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("FriendList")
+                .child(added_userId)
+                .child(currentUserId);
+
+        chatRefReceiver.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    chatRefReceiver.child("id").setValue(currentUserId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public void setCurrentUserId(String currentUserId) {
+        this.currentUserId = currentUserId;
+    }
+
+    public IClickAddFriend getiClickAddFriend() {
+        return iClickAddFriend;
+    }
+
+    public void setiClickAddFriend(IClickAddFriend iClickAddFriend) {
+        this.iClickAddFriend = iClickAddFriend;
     }
 }

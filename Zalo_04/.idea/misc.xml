@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable-anydpi/ic_action_name.xml" value="0.15" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable-xhdpi/circle_border.xml" value="0.1785" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/background_left.xml" value="0.1305" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/background_right.xml" value="0.1305" />
@@ -11,6 +12,7 @@
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/baseline_person_outline_24.xml" value="0.1925" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/baseline_portrait_24.xml" value="0.1925" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/baseline_schedule_24.xml" value="0.1925" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_add_friend.xml" value="0.15" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_back.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_call.xml" value="0.198" />
@@ -18,11 +20,15 @@
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_find.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_option.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_qr_scan.xml" value="0.198" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_video.xml" value="0.15" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_voice.xml" value="0.15" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_box_chat.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_message.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_register.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_reset_password.xml" value="0.2" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_send_audio.xml" value="0.264" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_start.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_upload_image.xml" value="0.1" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/bar_layout.xml" value="0.11510416666666666" />
@@ -33,11 +39,13 @@
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/fragment_contact_group.xml" value="0.16168478260869565" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/fragment_friend_contact.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/fragment_message.xml" value="0.24010416666666667" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/item_audio.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/item_chat.xml" value="0.24010416666666667" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/item_chat_left.xml" value="0.264" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/item_chat_right.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/item_user.xml" value="0.264" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/menu/menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/menu/menu_audio.xml" value="0.1484375" />
       </map>
     </option>
   </component>

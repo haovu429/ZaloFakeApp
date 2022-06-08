@@ -4,12 +4,32 @@ public class Chat {
 
     private String sender;
     private String receiver;
-    private String message;
+    private String message = "None";
+    private String video = "None";
+    private String audio = "None";
+    private String image = "None";
+    private boolean isseen;
 
-    public Chat(String sender, String receiver, String message) {
+    public Chat(String sender, String receiver, String message, String video, String audio, boolean isseen) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+        this.video = video;
+        this.audio = audio;
+        this.isseen = isseen;
+    }
+
+    public Chat(String sender, String receiver, String message, boolean isseen) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.message = message;
+        this.isseen = isseen;
+    }
+
+    public Chat(String sender, String receiver, boolean isseen) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.isseen = isseen;
     }
 
     public Chat() {
@@ -38,5 +58,37 @@ public class Chat {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isIsseen() {
+        return isseen;
+    }
+
+    public void setIsseen(boolean isseen) {
+        this.isseen = isseen;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
+    }
+
+    public String getAudio() {
+        return audio;
+    }
+
+    public void setAudio(String audio) {
+        this.audio = audio;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

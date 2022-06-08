@@ -7,13 +7,16 @@ public class User {
     private String imageURL;
     private String phone_number;
     private String status;
+    private String search;
 
-    public User(String id, String username, String imageURL, String phone_number, String status) {
+
+    public User(String id, String username, String imageURL, String phone_number, String status, String search) {
         this.id = id;
         this.username = username;
         this.imageURL = imageURL;
         this.phone_number = phone_number;
         this.status = status;
+        this.search = search;
     }
 
     public User() {
@@ -57,5 +60,13 @@ public class User {
 
     public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 }

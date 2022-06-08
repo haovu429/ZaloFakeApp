@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,10 +19,11 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class LoginActivity extends AppCompatActivity {
 
-    MaterialEditText email, password;
-    Button btn_login;
+    private MaterialEditText email, password;
+    private Button btn_login;
 
-    FirebaseAuth auth;
+    private FirebaseAuth auth;
+    private TextView forgot_password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,11 @@ public class LoginActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         btn_login = findViewById(R.id.btn_login);
+        forgot_password = findViewById(R.id.forgot_password);
+
+        forgot_password.setOnClickListener(View -> {
+            startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+        });
 
         btn_login.setOnClickListener(View ->{
             String txt_email = email.getText().toString();

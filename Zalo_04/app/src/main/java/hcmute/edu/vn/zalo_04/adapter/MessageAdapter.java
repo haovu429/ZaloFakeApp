@@ -62,6 +62,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull MessageAdapter.MessageViewHolder holder, int position) {
         Chat chat = chatList.get(position);
+
         if (chat == null){
             return;
         }
@@ -70,6 +71,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.profile_image.setImageResource(R.drawable.user_hao);
         } else {
             Glide.with(context).load(imageURL).into(holder.profile_image);
+        }
+
+        //check for last message
+        if (position == chatList.size() - 1){
+
+            if (chat.isIsseen()){
+                holder.txt_seen.setText("Seen");
+            } else {
+                holder.txt_seen.setText("Delivered");
+            }
+        } else {
+            holder.txt_seen.setVisibility(View.GONE);
         }
 
     }
@@ -87,10 +100,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         private CircleImageView profile_image;
         private TextView show_message;
 
+        public TextView txt_seen;
+
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             profile_image = (CircleImageView) itemView.findViewById(R.id.profile_image);
             show_message = (TextView) itemView.findViewById(R.id.show_message);
+            txt_seen = (TextView) itemView.findViewById(R.id.txt_seen);
         }
     }
 

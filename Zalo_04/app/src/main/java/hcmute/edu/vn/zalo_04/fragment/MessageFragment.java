@@ -29,6 +29,7 @@ import hcmute.edu.vn.zalo_04.R;
 import hcmute.edu.vn.zalo_04.adapter.ChatAdapter;
 import hcmute.edu.vn.zalo_04.adapter.UserAdapter;
 import hcmute.edu.vn.zalo_04.model.Chat;
+import hcmute.edu.vn.zalo_04.model.ChatList;
 import hcmute.edu.vn.zalo_04.model.ItemChatUI;
 import hcmute.edu.vn.zalo_04.model.User;
 
@@ -47,7 +48,9 @@ public class MessageFragment extends Fragment {
     private FirebaseUser firebaseUser;
     private DatabaseReference reference;
 
-    private List<String> str_usersList;
+    //upgrade
+    //private List<String> str_usersList;
+    private List<ChatList> chatL_usersList;
 
 
     public MessageFragment() {
@@ -70,7 +73,9 @@ public class MessageFragment extends Fragment {
 
         //ChatAdapter chatAdapter = new ChatAdapter();
 
-        List<ItemChatUI> itemChatUIList = new ArrayList<>();
+
+        //List<ItemChatUI> itemChatUIList = new ArrayList<>();
+
 
         //chatAdapter.setData(getData());
 
@@ -80,7 +85,28 @@ public class MessageFragment extends Fragment {
         rcv_chat.setLayoutManager(linearLayoutManager);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        str_usersList = new ArrayList<>();
+
+        chatL_usersList = new ArrayList<>();
+
+        reference = FirebaseDatabase.getInstance().getReference("ChatList").child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                chatL_usersList.clear();
+                for (DataSnapshot snapshot_index : snapshot.getChildren()){
+                    ChatList chatList = snapshot_index.getValue(ChatList.class);
+                    chatL_usersList.add(chatList);
+                }
+                addChatList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        /*//upgrade
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -106,13 +132,40 @@ public class MessageFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
 
         //rcv_chat.setAdapter(chatAdapter);
 
     }
 
-    private void readChats(){
+    private void addChatList() {
+        userList = new ArrayList<>();
+        reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userList.clear();
+                for (DataSnapshot snapshot_index : snapshot.getChildren()){
+                    User user = snapshot_index.getValue(User.class);
+                    for (ChatList chatList : chatL_usersList){
+                        if (user.getId().equals(chatList.getId())){
+                            userList.add(user);
+                        }
+                    }
+                }
+                userAdapter = new UserAdapter(getContext(), userList, true, true);
+                rcv_chat.setAdapter(userAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //upgrade
+   /* private void readChats(){
 
         userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -158,7 +211,7 @@ public class MessageFragment extends Fragment {
             }
         });
 
-    }
+    }*/
 
     private void AnhXa(){
         img_find = view.findViewById(R.id.img_find);

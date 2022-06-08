@@ -123,6 +123,9 @@ public class AccountFragment extends Fragment {
                 if (currentUser.getImageURL().equals("default")){
                     profile_img.setImageResource(R.drawable.user_hao);
                 } else {
+                    if (getContext() == null) {
+                        return;
+                    }
                     Glide.with(getContext()).load(currentUser.getImageURL()).into(profile_img);
                 }
             }

@@ -192,23 +192,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 for (DataSnapshot snapshot_index : snapshot.getChildren()){
                     Chat chat = snapshot_index.getValue(Chat.class);
                     if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
-                        theLastMessage = user.getUsername() + ": " + chat.getMessage();
+                        theLastMessage = user.getUsername() + ": " + getLastMess(chat.getMessage());
                     } else {
                         if (chat.getReceiver().equals(userId) && chat.getSender().equals(firebaseUser.getUid())){
-                            theLastMessage = "Bạn: " + chat.getMessage();
+                            theLastMessage = "Bạn: " + getLastMess(chat.getMessage());
                         }
                     }
                 }
 
-                switch (theLastMessage){
+                last_msg.setText(theLastMessage);
+
+
+                /*switch (theLastMessage){
                     case "default":
                         last_msg.setText("No Message");
+                        break;
+                    case "None":
+                        last_msg.setText("File");
                         break;
                     default:
                         last_msg.setText(theLastMessage);
                         break;
-                }
-                theLastMessage = "default";
+                }*/
+                //theLastMessage = "default";
 
             }
 
@@ -217,6 +223,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
             }
         });
+    }
+
+    private String getLastMess(String input){
+        if (input.equals("default")){
+            return "No Message";
+        } else {
+            if (input.equals("None")){
+                return "File";
+            } else {
+                return input;
+            }
+        }
     }
 
     private void addFriendList(String added_userId){

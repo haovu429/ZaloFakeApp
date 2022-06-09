@@ -19,6 +19,8 @@
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_call_video.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_find.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_option.xml" value="0.198" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_pause_audio.xml" value="0.1475" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_play_audio.xml" value="0.1475" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_qr_scan.xml" value="0.198" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_video.xml" value="0.15" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/drawable/ic_voice.xml" value="0.15" />
@@ -26,6 +28,7 @@
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_message.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_play_audio.xml" value="0.2" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_register.xml" value="0.25416666666666665" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_reset_password.xml" value="0.2" />
         <entry key="..\:/Android/Zalo_04/app/src/main/res/layout/activity_send_audio.xml" value="0.264" />

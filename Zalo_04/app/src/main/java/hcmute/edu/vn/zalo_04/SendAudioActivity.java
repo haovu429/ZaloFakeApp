@@ -45,9 +45,11 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import hcmute.edu.vn.zalo_04.model.Audio;
 import hcmute.edu.vn.zalo_04.model.Chat;
+import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class SendAudioActivity extends AppCompatActivity {
     Button buttonStart, buttonStop, buttonPlayLastRecordAudio,
@@ -288,12 +290,16 @@ public class SendAudioActivity extends AppCompatActivity {
     }
     private void upLoad(){
         String downloadLink = "";
-        final DatabaseReference reference = FirebaseDatabase.getInstance(
-                "https://record-b3083-default-rtdb.firebaseio.com").getReference();
-        HashMap<String,Object> hashMap = new HashMap<>();
+        /*final DatabaseReference reference = FirebaseDatabase.getInstance(
+                "https://record-b3083-default-rtdb.firebaseio.com").getReference();*/
+        //HashMap<String,Object> hashMap = new HashMap<>();
         Calendar calendar = Calendar.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
-        StorageReference n = storageReference.child("audio").child("audio"+calendar.getTimeInMillis()+".3gp");
+
+        String fileNameInFirebase = "audio"+calendar.getTimeInMillis()+".3gp";
+        String idFile = "audio"+calendar.getTimeInMillis();
+
+        StorageReference n = storageReference.child("audio").child(fileNameInFirebase);
         Uri uri = Uri.fromFile(new File(getFilePath()));
         Log.d("BBB","uri ="+uri.toString());
         UploadTask uploadTask = n.putFile(uri);
@@ -313,9 +319,13 @@ public class SendAudioActivity extends AppCompatActivity {
                     //updateDownloadLink(uri);
                     Chat chat = new Chat(firebaseUser.getUid(),userId, false);
                     chat.setAudio(uri.toString());
+                    sendMessage(chat);
+
+                    Audio audio = new Audio(idFile, firebaseUser.getUid(), userId, TimeUtil.getTimeNow());
+                    saveInfoAudio(audio);
 
                     Toast.makeText(SendAudioActivity.this,"Done",Toast.LENGTH_SHORT).show();
-                    Log.d("BBB",download.toString());
+                    //Log.d("BBB",download.toString());
 
                 }
                 else{
@@ -343,56 +353,31 @@ public class SendAudioActivity extends AppCompatActivity {
         hashMap.put("image", chat.getImage());
 
         reference.child("Chats").push().setValue(hashMap);
-
-        //add user to message fragment
-        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatList")
-                .child(firebaseUser.getUid())
-                .child(userId);
-
-        chatRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()){
-                    chatRef.child("id").setValue(userId);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("ChatList")
-                .child(userId)
-                .child(firebaseUser.getUid());
-
-        chatRefReceiver.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    chatRefReceiver.child("id").setValue(firebaseUser.getUid());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void saveInfoAudio(Audio audio){
 
-        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("AudioList")
+        DatabaseReference audioRef = FirebaseDatabase.getInstance().getReference("AudioList")
                 .child(firebaseUser.getUid())
                 .child(audio.getId());
 
-        chatRef.addValueEventListener(new ValueEventListener() {
+        audioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()){
-                    chatRef.child("id").setValue(userId);
+
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("id", audio.getId());
+                    hashMap.put("sender", audio.getSender());
+                    hashMap.put("receiver", audio.getReceiver());
+                    hashMap.put("time", audio.getTime());
+
+                    audioRef.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(SendAudioActivity.this, "saved info Audio", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
 
@@ -401,13 +386,6 @@ public class SendAudioActivity extends AppCompatActivity {
 
             }
         });
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("id", audio.getId());
-        hashMap.put("sender", audio.getSender());
-        hashMap.put("time", audio.getTime());
-
-        reference.child("Chats").push().setValue(hashMap);
     }
 
     public void updateDownloadLink(Uri url){

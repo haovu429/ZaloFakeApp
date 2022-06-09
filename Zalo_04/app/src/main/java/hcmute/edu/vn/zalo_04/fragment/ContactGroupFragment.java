@@ -177,7 +177,9 @@ public class ContactGroupFragment extends Fragment {
     private void getFriendList(){
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        if (firebaseUser == null){
+            return;
+        }
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("FriendList").child(firebaseUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -289,7 +291,7 @@ public class ContactGroupFragment extends Fragment {
                             if (user.getPhone_number().equals(contact.getPhone_number())){
                                 //Loc theo danh sach ban be
                                 boolean isFriend = false;
-                                if ( friendL_usersList.size()>0 ){
+                                if (friendL_usersList.size()>0 ){
                                     for (FriendList friend : friendL_usersList){
                                         if (user.getId().equals(friend.getId())){
                                             //Log.d("loi", "Ban: "+friend.getId());

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".PlayAudioActivity"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_pickFile"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pick file"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:background="#A2F1A5">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:textSize="18sp"
+            android:text="Title"
+            android:layout_gravity="center"/>
+        <SeekBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:padding="10dp"/>
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="00:00 / 00:00"
+            android:layout_gravity="center"
+            android:padding="10dp"/>
+
+        <Button
+            android:id="@+id/btn_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="play"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_exit"
+        android:layout_marginTop="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="exit"/>
+
+
+</LinearLayout>

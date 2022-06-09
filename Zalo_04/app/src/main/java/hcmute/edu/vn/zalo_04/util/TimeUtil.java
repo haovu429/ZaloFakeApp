@@ -5,6 +5,8 @@ package hcmute.edu.vn.zalo_04.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import java.util.Date;
 
@@ -16,12 +18,23 @@ public class TimeUtil {
     // SimpleDateFormat converts the
     // string format to date object
 
-
-
-
-    public TimeUtil() {
+    public static String getTimeNow(){
+        SimpleDateFormat sdf
+                = new SimpleDateFormat(
+                "dd-MM-yyyy HH:mm:ss");
+        //khai báo đối tượng current thuộc class LocalDateTime
+        LocalDateTime current = LocalDateTime.now();
+        //sử dụng class DateTimeFormatter để định dạng ngày giờ theo kiểu pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        //sử dụng phương thức format() để định dạng ngày giờ hiện tại rồi gán cho chuỗi formatted
+        String formatted = current.format(formatter);
+        //hiển thị chuỗi formatted ra màn hình
+        System.out.println("\n\nNgày giờ hiện tại: " + formatted);
+        return formatted;
     }
-    static void findDifferenceDay(String start_date, String end_date){
+
+
+    public static long findDifferenceDay(String start_date, String end_date){
         SimpleDateFormat sdf
                 = new SimpleDateFormat(
                 "dd-MM-yyyy HH:mm:ss");
@@ -46,16 +59,17 @@ public class TimeUtil {
                     .MILLISECONDS
                     .toDays(difference_In_Time)
                     % 365;
+            return difference_In_Days;
 
         }
         catch (ParseException e) {
             e.printStackTrace();
         }
+        return -1;
     }
 
 
-
-    static void findDifference(String start_date,
+    public static void findDifference(String start_date,
                                String end_date)
     {
         SimpleDateFormat sdf

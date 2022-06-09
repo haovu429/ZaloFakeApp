@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item android:id="@+id/item_video_exists"
+        android:title="Select video" />
+    <item android:id="@+id/item_create_video"
+        android:title="Create video" />
+    <item android:id="@+id/item_photo_exists"
+        android:title="Select photo" />
+    <item android:id="@+id/item_take_photo"
+        android:title="Take Photo" />
+</menu>

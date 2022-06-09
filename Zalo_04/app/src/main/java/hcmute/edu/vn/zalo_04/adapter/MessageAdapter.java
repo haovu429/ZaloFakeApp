@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -37,6 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.MessageActivity;
 import hcmute.edu.vn.zalo_04.PlayAudioActivity;
 import hcmute.edu.vn.zalo_04.R;
+import hcmute.edu.vn.zalo_04.ShowImageActivity;
 import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.model.User;
 
@@ -57,6 +59,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private FirebaseUser firebaseUser;
 
+    String testLink = "https://media5.sgp1.digitaloceanspaces.com/wp-content/uploads/2021/10/13142119/Stylish-Girls-Wallpapers.jpg";
 
     private String duration;
     //private SeekBar progress;
@@ -110,6 +113,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.layout_type_text.setVisibility(View.GONE);
                 holder.layout_type_image.setVisibility(View.VISIBLE);
                 holder.layout_type_audio.setVisibility(View.GONE);
+                setUI_ImageType(chat, holder);
                 break;
             case MSG_TYPE_AUDIO:
                 holder.layout_type_text.setVisibility(View.GONE);
@@ -149,6 +153,40 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return 0;
     }
 
+    private void setUI_ImageType(Chat chat, MessageViewHolder holder){
+
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.mipmap.ic_launcher_round)
+                .error(R.mipmap.ic_launcher_round);
+
+        //hien thi anh dai dien
+        if (imageURL.equals("default")){
+            holder.profile_image2.setImageResource(R.drawable.user_hao);
+        } else {
+            Glide.with(context).load(imageURL).into(holder.profile_image2);
+        }
+
+        //show file anh
+
+        //Glide.with(context).load(options).into(holder.image_sent);
+        try {
+            Glide.with(context).load(chat.getImage()).apply(options).into(holder.image_sent);
+        } catch (Exception e){
+            //loi duong link sai
+            e.printStackTrace();
+        }
+
+        holder.image_sent.setOnClickListener(View -> {
+            Intent intent = new Intent(context, ShowImageActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("imageUrl", chat.getImage());
+            intent.putExtras(bundle);
+            context.startActivity(intent);
+        });
+
+    }
+
     private void setUI_TextType(Chat chat, MessageViewHolder holder){
         holder.show_message.setText(chat.getMessage());
         if (imageURL.equals("default")){
@@ -160,6 +198,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private void setUI_AudioType(Chat chat, MessageViewHolder holder){
 
+        if (imageURL.equals("default")){
+            holder.profile_image1.setImageResource(R.drawable.user_hao);
+        } else {
+            Glide.with(context).load(imageURL).into(holder.profile_image1);
+        }
+
+        holder.type_file1.setText("Audio");
+
         holder.itemView.setOnClickListener(View -> {
             Intent intent = new Intent(context, PlayAudioActivity.class);
             Bundle bundle = new Bundle();
@@ -167,79 +213,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             intent.putExtras(bundle);
             context.startActivity(intent);
         });
-
-        /*Uri uri = Uri.parse(chat.getAudio());
-
-        createMediaPlayer(uri, holder);
-
-        System.out.println(holder.control_audio);
-
-        holder.control_audio.setOnClickListener(View ->{
-            Log.d("loi", "Chay duoc ma");
-            if (mediaPlayer != null) {
-                if (mediaPlayer.isPlaying()){
-                    mediaPlayer.pause();
-                    holder.control_audio.setImageResource(R.drawable.ic_play_audio);
-                    timer.shutdown();
-                } else {
-                    mediaPlayer.start();
-                    holder.control_audio.setImageResource(R.drawable.ic_pause_audio);
-                    timer = Executors.newScheduledThreadPool(1);
-                    timer.scheduleAtFixedRate(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mediaPlayer != null){
-                                if (!holder.progress.isPressed()){
-                                    holder.progress.setProgress(mediaPlayer.getCurrentPosition());
-                                }
-                            }
-                        }
-                    }, 10, 10, TimeUnit.MILLISECONDS);
-                }
-            }
-        });
-
-        holder.progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (mediaPlayer != null){
-                    int millis = mediaPlayer.getCurrentPosition();
-                    long total_secs = TimeUnit.SECONDS.convert(millis, TimeUnit.MILLISECONDS);
-                    long mins = TimeUnit.MINUTES.convert(total_secs, TimeUnit.SECONDS);
-                    long secs = total_secs - (mins*60);
-                    holder.time.setText(mins + ":" + secs + "/" + duration);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                if( mediaPlayer != null){
-                    mediaPlayer.seekTo(holder.progress.getProgress());
-                }
-
-            }
-        });
-        holder.control_audio.setEnabled(false);*/
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        private CircleImageView profile_image;
+        private CircleImageView profile_image, profile_image1, profile_image2, profile_image3;
         private TextView show_message;
 
-        public TextView txt_seen;
+        public TextView txt_seen, type_file1, type_file2;
 
         private ImageView control_audio;
         private SeekBar progress;
 
-        private ImageView layout_type_image;
+        private ImageView image_sent;
         private LinearLayout layout_type_audio;
         private RelativeLayout layout_type_text;
+        private LinearLayout layout_type_image;
 
         private TextView title, time;
 
@@ -252,9 +241,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             progress = (SeekBar) itemView.findViewById(R.id.progress);
             time = (TextView) itemView.findViewById(R.id.time);
 
-            layout_type_image = (ImageView) itemView.findViewById(R.id.layout_type_image);
+            layout_type_image = (LinearLayout) itemView.findViewById(R.id.layout_type_image);
             layout_type_text = (RelativeLayout) itemView.findViewById(R.id.layout_type_text);
             layout_type_audio = (LinearLayout) itemView.findViewById(R.id.layout_item_audio);
+
+            type_file1 = (TextView) itemView.findViewById(R.id.type_file1);
+            profile_image1 = (CircleImageView) itemView.findViewById(R.id.profile_image1);
+            profile_image2 = (CircleImageView) itemView.findViewById(R.id.profile_image2);
+
+            image_sent = (ImageView) itemView.findViewById(R.id.image_sent);
         }
     }
 

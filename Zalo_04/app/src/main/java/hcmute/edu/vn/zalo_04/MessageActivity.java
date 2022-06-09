@@ -1,5 +1,8 @@
 package hcmute.edu.vn.zalo_04;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -7,19 +10,28 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,15 +39,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.adapter.MessageAdapter;
+import hcmute.edu.vn.zalo_04.model.Audio;
 import hcmute.edu.vn.zalo_04.model.Chat;
+import hcmute.edu.vn.zalo_04.model.Image;
 import hcmute.edu.vn.zalo_04.model.User;
+import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -61,6 +81,17 @@ public class MessageActivity extends AppCompatActivity {
 
     private ImageView img_video, img_audio;
     private String urlAudio;
+
+    private ProgressBar progressBar;
+
+    private Uri imageUri;
+    private StorageTask uploadTask;
+    private StorageReference storageReference;
+
+    private RelativeLayout layout;
+
+    private ActivityResultLauncher<String> takePhoto;
+    private ActivityResultLauncher<String> uploadPhoto;
 
 
     @Override
@@ -106,6 +137,8 @@ public class MessageActivity extends AppCompatActivity {
         img_video = findViewById(R.id.img_video);
         img_audio = findViewById(R.id.img_audio);
 
+        layout = findViewById(R.id.layout);  //specify here Root layout Id
+
         img_audio.setOnClickListener(View ->{
             PopupMenu popupMenu = new PopupMenu(this, View);
             popupMenu.getMenuInflater().inflate(R.menu.menu_audio, popupMenu.getMenu());
@@ -134,7 +167,36 @@ public class MessageActivity extends AppCompatActivity {
 
 
         img_video.setOnClickListener(View -> {
-
+            PopupMenu popupMenu = new PopupMenu(this, View);
+            popupMenu.getMenuInflater().inflate(R.menu.menu_video, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.item_video_exists:
+                            //test choi
+                            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/channel/UC5GCMUwYXZTMKVc8OBvLbvQ")));
+                            return true;
+                        case R.id.item_create_video:
+                            Intent intent = new Intent(MessageActivity.this, SendAudioActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("userId", userId);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                            return true;
+                        case R.id.item_photo_exists:
+                            uploadPhoto.launch("image/*");
+                            return true;
+                        case R.id.item_take_photo:
+                            //test choi
+                            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/channel/UC5GCMUwYXZTMKVc8OBvLbvQ")));
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            });
+            popupMenu.show();
         });
 
 
@@ -174,6 +236,29 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
         seenMessage(userId);
+
+        takePhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri result) {
+                        //profile_img.setImageURI(result);
+                        uploadPhoto.launch("image/*");
+                    }
+                });
+
+        uploadPhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri result) {
+                        imageUri = result;
+
+                        if (uploadTask != null && uploadTask.isInProgress()){
+                            Toast.makeText(MessageActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
+                        } else {
+                            uploadImage();
+                        }
+                    }
+                });
     }
 
 
@@ -210,6 +295,8 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("isseen", chat.isIsseen());
         hashMap.put("video", chat.getVideo());
         hashMap.put("audio", chat.getAudio());
+        hashMap.put("image", chat.getImage());
+        hashMap.put("time", chat.getTime());
 
         reference.child("Chats").push().setValue(hashMap);
 
@@ -299,4 +386,117 @@ public class MessageActivity extends AppCompatActivity {
         reference.removeEventListener(seenListener);
         status("offline");
     }
+
+    private String getFileExtension(Uri uri){
+        ContentResolver contentResolver = this.getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    private void uploadImage() {
+        progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(progressBar, params);
+
+        if (imageUri != null){
+
+            storageReference = FirebaseStorage.getInstance().getReference("uploads");
+
+
+            Calendar calendar = Calendar.getInstance();
+            String idFile = String.valueOf(calendar.getTimeInMillis());
+            final StorageReference fileReference = storageReference.child(idFile
+                    +"."+ getFileExtension(imageUri));
+
+            String fileNameInFirebase = "image"+calendar.getTimeInMillis() + "." + getFileExtension(imageUri);
+            StorageReference n = storageReference.child("image").child(fileNameInFirebase);
+            //deleteOldImage(currentUser.getImageURL());
+
+            uploadTask = n.putFile(imageUri);
+
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()){
+                        throw task.getException();
+                    }
+                    return n.getDownloadUrl();
+                    //System.out.println("loi");
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()){
+                        Uri downloadUri = task.getResult();
+                        String mUri = downloadUri.toString();
+
+                        String timeNow = TimeUtil.getTimeNow();
+
+                        //updateDownloadLink(uri);
+                        Chat chat = new Chat(firebaseUser.getUid(),userId, false);
+                        chat.setImage(downloadUri.toString());
+                        chat.setTime(timeNow);
+                        sendMessage(chat);
+
+                        Image image = new Image(idFile, firebaseUser.getUid(), userId, timeNow);
+                        saveInfoImage(image);
+
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(MessageActivity.this,"False!", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MessageActivity.this, e.getMessage(), Toast.LENGTH_SHORT);
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            Toast.makeText(MessageActivity.this, "No image selected", Toast.LENGTH_SHORT).show();
+            progressBar.setVisibility(ProgressBar.INVISIBLE);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void saveInfoImage(Image image){
+
+        DatabaseReference audioRef = FirebaseDatabase.getInstance().getReference("ImageList")
+                .child(firebaseUser.getUid())
+                .child(image.getId());
+
+        audioRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("id", image.getId());
+                    hashMap.put("sender", image.getSender());
+                    hashMap.put("receiver", image.getReceiver());
+                    hashMap.put("time", image.getTime());
+
+                    audioRef.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(MessageActivity.this, "saved info Image", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 }

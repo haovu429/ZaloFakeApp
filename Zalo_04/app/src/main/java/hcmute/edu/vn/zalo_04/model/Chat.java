@@ -8,6 +8,7 @@ public class Chat {
     private String video = "None";
     private String audio = "None";
     private String image = "None";
+    private String time;
     private boolean isseen;
 
     public Chat(String sender, String receiver, String message, String video, String audio, boolean isseen) {
@@ -90,5 +91,13 @@ public class Chat {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

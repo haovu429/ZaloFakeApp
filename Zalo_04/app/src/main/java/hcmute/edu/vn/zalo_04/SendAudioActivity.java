@@ -316,12 +316,15 @@ public class SendAudioActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Uri> task) {
                 if(task.isSuccessful()){
                     Uri uri = task.getResult();
+
+                    String timeNow = TimeUtil.getTimeNow();
                     //updateDownloadLink(uri);
                     Chat chat = new Chat(firebaseUser.getUid(),userId, false);
                     chat.setAudio(uri.toString());
+                    chat.setTime(timeNow);
                     sendMessage(chat);
 
-                    Audio audio = new Audio(idFile, firebaseUser.getUid(), userId, TimeUtil.getTimeNow());
+                    Audio audio = new Audio(idFile, firebaseUser.getUid(), userId, timeNow);
                     saveInfoAudio(audio);
 
                     Toast.makeText(SendAudioActivity.this,"Done",Toast.LENGTH_SHORT).show();
@@ -351,8 +354,48 @@ public class SendAudioActivity extends AppCompatActivity {
         hashMap.put("video", chat.getVideo());
         hashMap.put("audio", chat.getAudio());
         hashMap.put("image", chat.getImage());
+        hashMap.put("time", chat.getTime());
 
         reference.child("Chats").push().setValue(hashMap);
+
+        //add user to message fragment
+        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatList")
+                .child(firebaseUser.getUid())
+                .child(userId);
+
+        chatRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+                    chatRef.child("id").setValue(userId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("ChatList")
+                .child(userId)
+                .child(firebaseUser.getUid());
+
+        chatRefReceiver.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists()){
+                    chatRefReceiver.child("id").setValue(firebaseUser.getUid());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     private void saveInfoAudio(Audio audio){

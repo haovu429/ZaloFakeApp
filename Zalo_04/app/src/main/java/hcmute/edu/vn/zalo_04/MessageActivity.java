@@ -1,5 +1,8 @@
 package hcmute.edu.vn.zalo_04;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -7,13 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,10 +56,16 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.MyInterface.IReleaseStorage;
@@ -91,10 +109,17 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
 
     private RelativeLayout layout;
 
-    private ActivityResultLauncher<String> takePhoto;
+    private ActivityResultLauncher<Intent> takePhoto;
     private ActivityResultLauncher<String> uploadPhoto;
 
     private boolean refresh = false;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private Bitmap bitmap;
+
+    private static final int CAMERA_REQUEST_CODE = 102;
+    private String[] cameraPermissions;
 
 
     @Override
@@ -140,7 +165,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         img_video = findViewById(R.id.img_video);
         img_audio = findViewById(R.id.img_audio);
 
-        layout = findViewById(R.id.layout);  //specify here Root layout Id
+        layout = findViewById(R.id.layout);  //specify here Root layout I
 
         img_audio.setOnClickListener(View ->{
             PopupMenu popupMenu = new PopupMenu(this, View);
@@ -191,8 +216,15 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                             uploadPhoto.launch("image/*");
                             return true;
                         case R.id.item_take_photo:
-                            //test choi
-                            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/channel/UC5GCMUwYXZTMKVc8OBvLbvQ")));
+                            //Uri uri = Uri.parse("image/*");
+                            RequestCameraPermission();
+                            Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            if (intent1.resolveActivity(getPackageManager()) != null){
+                                takePhoto.launch(intent1);
+                            } else {
+                                Toast.makeText(MessageActivity.this, "Not support", Toast.LENGTH_SHORT).show();
+                            }
+
                             return true;
                         default:
                             return false;
@@ -241,14 +273,19 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         });
         seenMessage(userId);
 
-        takePhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
-                new ActivityResultCallback<Uri>() {
-                    @Override
-                    public void onActivityResult(Uri result) {
-                        //profile_img.setImageURI(result);
-                        uploadPhoto.launch("image/*");
-                    }
-                });
+        takePhoto = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null){
+                    Bundle bundle1 = result.getData().getExtras();
+                    bitmap = (Bitmap) bundle1.get("data");
+                    saveImage(bitmap);
+                    uploadImage();
+
+                }
+            }
+        });
 
         uploadPhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
@@ -256,7 +293,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                     public void onActivityResult(Uri result) {
                         imageUri = result;
 
-                        if (uploadTask != null && uploadTask.isInProgress()){
+                        if (uploadTask != null && uploadTask.isInProgress()) {
                             Toast.makeText(MessageActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
                         } else {
                             uploadImage();
@@ -264,6 +301,59 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                     }
                 });
     }
+    private void RequestCameraPermission() {
+        cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        ActivityCompat.requestPermissions(this, cameraPermissions, CAMERA_REQUEST_CODE);
+    }
+    /*private void storeImage(Bitmap image) {
+        File pictureFile = getOutputMediaFile();
+        if (pictureFile == null) {
+            Log.d(TAG,
+                    "Error creating media file, check storage permissions: ");// e.getMessage());
+            return;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d(TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "Error accessing file: " + e.getMessage());
+        }
+    }*/
+    private void saveImage(Bitmap bitmap){
+        OutputStream fos;
+        try {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q){
+                ContentResolver resolver = getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "Image" + ".jpg");
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                Objects.requireNonNull(fos);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private boolean CheckCameraPermission() {
+        boolean r1 = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+        boolean r2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED;
+        return r1 && r2;
+    }
+    /*private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            (takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } catch (ActivityNotFoundException e) {
+            // display error state to the user
+        }
+    }*/
 
 
     private void seenMessage(final String userId){
@@ -401,6 +491,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         reference.removeEventListener(seenListener);
         status("offline");
     }
+
 
     private String getFileExtension(Uri uri){
         ContentResolver contentResolver = this.getContentResolver();

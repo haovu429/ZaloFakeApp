@@ -207,6 +207,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         if (chat == null){
                             return;
                         }
+
                         try{
                             if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
                                 theLastMessage = user.getUsername() + ": " + getLastMess(chat.getMessage());
@@ -217,7 +218,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                             }
                         } catch (Exception e){
                             e.printStackTrace();
-                            snapshot_index.getRef().removeValue();
+                            continue;
+                            //snapshot_index.getRef().removeValue();
                         }
 
                     }

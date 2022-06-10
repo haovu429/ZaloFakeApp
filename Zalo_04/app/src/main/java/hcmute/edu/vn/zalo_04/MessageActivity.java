@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.zalo_04.MyInterface.IReleaseStorage;
 import hcmute.edu.vn.zalo_04.adapter.MessageAdapter;
 import hcmute.edu.vn.zalo_04.model.Audio;
 import hcmute.edu.vn.zalo_04.model.Chat;
@@ -57,7 +58,7 @@ import hcmute.edu.vn.zalo_04.model.Image;
 import hcmute.edu.vn.zalo_04.model.User;
 import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity implements IReleaseStorage {
 
     private CircleImageView profile_image;
     private TextView username;
@@ -92,6 +93,8 @@ public class MessageActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<String> takePhoto;
     private ActivityResultLauncher<String> uploadPhoto;
+
+    private boolean refresh = false;
 
 
     @Override
@@ -206,6 +209,7 @@ public class MessageActivity extends AppCompatActivity {
             String msg = txt_send.getText().toString().trim();
             if (!msg.equals("")){
                 Chat chat = new Chat(firebaseUser.getUid(), userId, msg, false);
+                chat.setTime(TimeUtil.getTimeNow());
                 sendMessage(chat);
             } else {
                 Toast.makeText(MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
@@ -267,8 +271,18 @@ public class MessageActivity extends AppCompatActivity {
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //Chờ class ReleaseStorage cập nhât tín hiệu giải phóng bộ nhớ
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (refresh){
+                    return;
+                }
                 for (DataSnapshot snapshot_index : snapshot.getChildren()){
                     Chat chat = snapshot_index.getValue(Chat.class);
+
                     if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("isseen", true);
@@ -297,6 +311,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("audio", chat.getAudio());
         hashMap.put("image", chat.getImage());
         hashMap.put("time", chat.getTime());
+        hashMap.put("idfile", chat.getIdfile());
 
         reference.child("Chats").push().setValue(hashMap);
 
@@ -405,11 +420,9 @@ public class MessageActivity extends AppCompatActivity {
 
 
             Calendar calendar = Calendar.getInstance();
-            String idFile = String.valueOf(calendar.getTimeInMillis());
-            final StorageReference fileReference = storageReference.child(idFile
-                    +"."+ getFileExtension(imageUri));
-
-            String fileNameInFirebase = "image"+calendar.getTimeInMillis() + "." + getFileExtension(imageUri);
+            //String idFile = String.valueOf(calendar.getTimeInMillis());
+            String idFile = "image"+calendar.getTimeInMillis();
+            String fileNameInFirebase = idFile + "." + getFileExtension(imageUri);
             StorageReference n = storageReference.child("image").child(fileNameInFirebase);
             //deleteOldImage(currentUser.getImageURL());
 
@@ -438,9 +451,10 @@ public class MessageActivity extends AppCompatActivity {
                         Chat chat = new Chat(firebaseUser.getUid(),userId, false);
                         chat.setImage(downloadUri.toString());
                         chat.setTime(timeNow);
+                        chat.setIdfile(idFile);
                         sendMessage(chat);
 
-                        Image image = new Image(idFile, firebaseUser.getUid(), userId, timeNow);
+                        Image image = new Image(idFile, firebaseUser.getUid(), userId, timeNow, fileNameInFirebase);
                         saveInfoImage(image);
 
                         progressBar.setVisibility(ProgressBar.INVISIBLE);
@@ -482,6 +496,7 @@ public class MessageActivity extends AppCompatActivity {
                     hashMap.put("sender", image.getSender());
                     hashMap.put("receiver", image.getReceiver());
                     hashMap.put("time", image.getTime());
+                    hashMap.put("filename", image.getFilename());
 
                     audioRef.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -499,4 +514,13 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void getTimelineOK() {
+        this.refresh = true;
+    }
+
+    @Override
+    public void releaseFinish() {
+        this.refresh = false;
+    }
 }

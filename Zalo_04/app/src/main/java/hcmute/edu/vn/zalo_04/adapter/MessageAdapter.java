@@ -50,6 +50,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public static final int MSG_TYPE_AUDIO= 2;
     public static final int MSG_TYPE_VIDEO = 3;
     public static final int MSG_TYPE_TEXT= 4;
+    public static final int MSG_TYPE_DELETED= 5;
 
     private Context context;
     private List<Chat> chatList;
@@ -127,6 +128,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.layout_type_image.setVisibility(View.GONE);
                 holder.layout_type_audio.setVisibility(View.GONE);
                 break;
+            default:
+                holder.layout_type_text.setVisibility(View.VISIBLE);
+                holder.layout_type_image.setVisibility(View.GONE);
+                holder.layout_type_audio.setVisibility(View.GONE);
+                holder.show_message.setText("The message has been deleted");
 
         }
 
@@ -276,7 +282,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if (!chat.getVideo().equals("None")){
             return MSG_TYPE_VIDEO;
         }
-        return MSG_TYPE_TEXT;
+        return MSG_TYPE_DELETED;
     }
 
     private void createMediaPlayer(Uri uri, MessageViewHolder holder) {

@@ -85,10 +85,10 @@ public class ContactFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 1:
-                    tab.setText("Group"); // posittion = 0
+                    tab.setText("Your contact"); // posittion = 0
                     break;
                 case 2:
-                    tab.setText("OA");
+                    tab.setText("Find");
                     break;
                 default:
                     tab.setText("Friend");

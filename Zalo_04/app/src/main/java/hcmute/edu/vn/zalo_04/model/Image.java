@@ -5,12 +5,14 @@ public class Image {
     private String sender;
     private String receiver;
     private String time;
+    private String filename;
 
-    public Image(String id, String sender, String receiver, String time) {
+    public Image(String id, String sender, String receiver, String time, String filename) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.time = time;
+        this.filename = filename;
     }
 
     public Image() {
@@ -46,5 +48,13 @@ public class Image {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

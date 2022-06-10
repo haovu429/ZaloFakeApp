@@ -1,5 +1,6 @@
 package hcmute.edu.vn.zalo_04.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
@@ -42,6 +43,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     private String currentUserId;
 
     private Context context;
+    private Activity activity;
     private List<User> userList;
     private boolean ischat;
     private DatabaseReference reference;
@@ -50,8 +52,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private IClickAddFriend iClickAddFriend;
 
-    public UserAdapter(Context context, List<User> userList, boolean ischat, boolean isfriend) {
-        this.context = context;
+    public UserAdapter(Activity activity, List<User> userList, boolean ischat, boolean isfriend) {
+        //this.context = context;
+        this.activity = activity;
         this.userList = userList;
         this.ischat = ischat;
         this.isfriend = isfriend;
@@ -83,11 +86,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         if (user.getImageURL().equals("default")){
             holder.profile_image.setImageResource(R.drawable.user_hao);
         } else {
-            Glide.with(context).load(user.getImageURL()).into(holder.profile_image);
+            Glide.with(activity).load(user.getImageURL()).into(holder.profile_image);
         }
 
         if (ischat){
-            lastMessage(user, holder.last_msg);
+            try{
+                lastMessage(user, holder.last_msg);
+            } catch (Exception e){
+                activity.finish();
+                activity.startActivity(activity.getIntent());
+            }
+
         } else {
             holder.last_msg.setVisibility(View.GONE);
         }
@@ -116,7 +125,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(context, "Refresh status", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Refresh status", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -141,11 +150,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
 
         holder.itemView.setOnClickListener(View -> {
-            Intent intent = new Intent(context, MessageActivity.class);
+            Intent intent = new Intent(activity, MessageActivity.class);
             intent.putExtra("userId", user.getId());
-            context.startActivity(intent);
+            activity.startActivity(intent);
         });
 
+    }
+    private void refreshActivity(){
+        activity.finish();
+        activity.startActivity(activity.getIntent());
     }
 
 
@@ -184,23 +197,32 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         theLastMessage = "default";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
+        try{
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                for (DataSnapshot snapshot_index : snapshot.getChildren()){
-                    Chat chat = snapshot_index.getValue(Chat.class);
-                    if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
-                        theLastMessage = user.getUsername() + ": " + getLastMess(chat.getMessage());
-                    } else {
-                        if (chat.getReceiver().equals(userId) && chat.getSender().equals(firebaseUser.getUid())){
-                            theLastMessage = "Bạn: " + getLastMess(chat.getMessage());
+                    for (DataSnapshot snapshot_index : snapshot.getChildren()){
+                        Chat chat = snapshot_index.getValue(Chat.class);
+                        if (chat == null){
+                            return;
                         }
-                    }
-                }
+                        try{
+                            if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userId)){
+                                theLastMessage = user.getUsername() + ": " + getLastMess(chat.getMessage());
+                            } else {
+                                if (chat.getReceiver().equals(userId) && chat.getSender().equals(firebaseUser.getUid())){
+                                    theLastMessage = "Bạn: " + getLastMess(chat.getMessage());
+                                }
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                            snapshot_index.getRef().removeValue();
+                        }
 
-                last_msg.setText(theLastMessage);
+                    }
+
+                    last_msg.setText(theLastMessage);
 
 
                 /*switch (theLastMessage){
@@ -214,15 +236,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         last_msg.setText(theLastMessage);
                         break;
                 }*/
-                //theLastMessage = "default";
+                    //theLastMessage = "default";
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        } catch (Exception e){
+            refreshActivity();
+        }
+
     }
 
     private String getLastMess(String input){

@@ -35,6 +35,7 @@ import hcmute.edu.vn.zalo_04.fragment.AccountFragment;
 import hcmute.edu.vn.zalo_04.fragment.ContactFragment;
 import hcmute.edu.vn.zalo_04.fragment.MessageFragment;
 import hcmute.edu.vn.zalo_04.model.User;
+import hcmute.edu.vn.zalo_04.task.ReleaseStorage;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+
+        //release storage
+        ReleaseStorage releaseStorage = new ReleaseStorage(firebaseUser, this);
+        releaseStorage.deleteResource();
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override

@@ -180,7 +180,7 @@ public class ContactFriendFragment extends Fragment {
                         }
                     }
                 }
-                userAdapter = new UserAdapter(getContext(), userList, false, true);
+                userAdapter = new UserAdapter(getActivity(), userList, false, true);
                 rcv_friended.setAdapter(userAdapter);
             }
 

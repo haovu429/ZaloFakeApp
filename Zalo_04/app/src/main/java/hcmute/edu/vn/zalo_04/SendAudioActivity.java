@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.content.ContentResolver;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -296,11 +298,13 @@ public class SendAudioActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
 
-        String fileNameInFirebase = "audio"+calendar.getTimeInMillis()+".3gp";
+        Uri uri = Uri.fromFile(new File(getFilePath()));
+
+        String fileNameInFirebase = "audio"+calendar.getTimeInMillis()+ ".3gp";
         String idFile = "audio"+calendar.getTimeInMillis();
 
         StorageReference n = storageReference.child("audio").child(fileNameInFirebase);
-        Uri uri = Uri.fromFile(new File(getFilePath()));
+
         Log.d("BBB","uri ="+uri.toString());
         UploadTask uploadTask = n.putFile(uri);
         uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -322,9 +326,10 @@ public class SendAudioActivity extends AppCompatActivity {
                     Chat chat = new Chat(firebaseUser.getUid(),userId, false);
                     chat.setAudio(uri.toString());
                     chat.setTime(timeNow);
+                    chat.setIdfile(idFile);
                     sendMessage(chat);
 
-                    Audio audio = new Audio(idFile, firebaseUser.getUid(), userId, timeNow);
+                    Audio audio = new Audio(idFile, firebaseUser.getUid(), userId, timeNow, fileNameInFirebase);
                     saveInfoAudio(audio);
 
                     Toast.makeText(SendAudioActivity.this,"Done",Toast.LENGTH_SHORT).show();
@@ -343,6 +348,12 @@ public class SendAudioActivity extends AppCompatActivity {
         });
     }
 
+    private String getFileExtension(Uri uri){
+        ContentResolver contentResolver = this.getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
     private void sendMessage(Chat chat){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
@@ -355,6 +366,7 @@ public class SendAudioActivity extends AppCompatActivity {
         hashMap.put("audio", chat.getAudio());
         hashMap.put("image", chat.getImage());
         hashMap.put("time", chat.getTime());
+        hashMap.put("idfile", chat.getIdfile());
 
         reference.child("Chats").push().setValue(hashMap);
 
@@ -414,6 +426,7 @@ public class SendAudioActivity extends AppCompatActivity {
                     hashMap.put("sender", audio.getSender());
                     hashMap.put("receiver", audio.getReceiver());
                     hashMap.put("time", audio.getTime());
+                    hashMap.put("filename", audio.getFilename());
 
                     audioRef.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

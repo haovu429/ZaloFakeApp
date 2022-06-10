@@ -51,6 +51,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.R;
+import hcmute.edu.vn.zalo_04.SetDeleteTimelineActivity;
 import hcmute.edu.vn.zalo_04.model.User;
 
 public class AccountFragment extends Fragment {
@@ -161,6 +162,7 @@ public class AccountFragment extends Fragment {
         btnUpdate.setOnClickListener(View ->{
             //CreateData createData = new CreateData();
             //createData.createDB();
+            startActivity(new Intent(getContext(), SetDeleteTimelineActivity.class));
         });
 
         btn_change_pass.setOnClickListener(View -> {

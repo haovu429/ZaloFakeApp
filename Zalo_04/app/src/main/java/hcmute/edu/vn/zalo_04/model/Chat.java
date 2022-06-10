@@ -10,6 +10,7 @@ public class Chat {
     private String image = "None";
     private String time;
     private boolean isseen;
+    private String idfile = "None";
 
     public Chat(String sender, String receiver, String message, String video, String audio, boolean isseen) {
         this.sender = sender;
@@ -99,5 +100,13 @@ public class Chat {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getIdfile() {
+        return idfile;
+    }
+
+    public void setIdfile(String idfile) {
+        this.idfile = idfile;
     }
 }

@@ -27,6 +27,9 @@
         android:theme="@style/Theme.Zalo_04"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SetDeleteTimelineActivity"
+            android:exported="false" />
+        <activity
             android:name=".ShowImageActivity"
             android:exported="false" />
         <activity

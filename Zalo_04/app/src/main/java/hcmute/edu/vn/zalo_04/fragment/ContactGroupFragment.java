@@ -117,7 +117,7 @@ public class ContactGroupFragment extends Fragment {
 
         });
 
-        userAdapter = new UserAdapter(getContext(), userList, false, false);
+        userAdapter = new UserAdapter(getActivity(), userList, false, false);
         userAdapter.setiClickAddFriend(new IClickAddFriend() {
             @Override
             public void clickAddFriend() throws InterruptedException {

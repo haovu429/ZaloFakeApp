@@ -33,7 +33,7 @@ public class ShowImageActivity extends AppCompatActivity {
         }
 
         RequestOptions options = new RequestOptions()
-                .centerCrop()
+                .fitCenter()
                 .placeholder(R.mipmap.ic_launcher_round)
                 .error(R.mipmap.ic_launcher_round);
 

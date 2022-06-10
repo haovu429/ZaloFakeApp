@@ -153,7 +153,7 @@ public class MessageFragment extends Fragment {
                         }
                     }
                 }
-                userAdapter = new UserAdapter(getContext(), userList, true, true);
+                userAdapter = new UserAdapter(getActivity(), userList, true, true);
                 rcv_chat.setAdapter(userAdapter);
             }
 

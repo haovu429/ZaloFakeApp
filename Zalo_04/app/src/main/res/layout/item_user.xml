@@ -11,7 +11,7 @@
         android:id="@+id/profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/user_hao" />
+        android:src="@drawable/user_hao2" />
 
     <TextView
         android:id="@+id/username"

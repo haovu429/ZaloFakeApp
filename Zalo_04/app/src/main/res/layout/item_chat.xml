@@ -9,7 +9,7 @@
         android:layout_height="75dp">
         <ImageView
             android:id="@+id/img_chat"
-            android:src="@drawable/user_hao"
+            android:src="@drawable/user_hao2"
             android:layout_gravity="center"
             android:layout_margin="15dp"
             android:layout_width="50dp"

@@ -22,13 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import hcmute.edu.vn.zalo_04.R;
-import hcmute.edu.vn.zalo_04.adapter.ChatAdapter;
 import hcmute.edu.vn.zalo_04.adapter.UserAdapter;
-import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.model.ChatList;
 import hcmute.edu.vn.zalo_04.model.ItemChatUI;
 import hcmute.edu.vn.zalo_04.model.User;
@@ -223,8 +220,8 @@ public class MessageFragment extends Fragment {
 
     private List<ItemChatUI> getData(){
         List<ItemChatUI> itemChatUIList = new ArrayList<>();
-        ItemChatUI itemChatUI1 = new ItemChatUI(R.drawable.user_hao,"Hao dep trai dang doi ban rep.");
-        ItemChatUI itemChatUI2 =new ItemChatUI(R.drawable.user_hao, "Bảo mật web cô Châu.");
+        ItemChatUI itemChatUI1 = new ItemChatUI(R.drawable.user_hao2,"Hao dep trai dang doi ban rep.");
+        ItemChatUI itemChatUI2 =new ItemChatUI(R.drawable.user_hao2, "Bảo mật web cô Châu.");
 
         itemChatUIList.add(itemChatUI1);
         itemChatUIList.add(itemChatUI2);

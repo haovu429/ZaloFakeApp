@@ -3,8 +3,6 @@ package hcmute.edu.vn.zalo_04.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import hcmute.edu.vn.zalo_04.MainActivity;
 import hcmute.edu.vn.zalo_04.MessageActivity;
 import hcmute.edu.vn.zalo_04.MyInterface.IClickAddFriend;
 import hcmute.edu.vn.zalo_04.R;
-import hcmute.edu.vn.zalo_04.RegisterActivity;
 import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.model.User;
 
@@ -84,7 +80,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         //System.out.println("Adapter: " + user.getUsername());
 
         if (user.getImageURL().equals("default")){
-            holder.profile_image.setImageResource(R.drawable.user_hao);
+            holder.profile_image.setImageResource(R.drawable.user_hao2);
         } else {
             Glide.with(activity).load(user.getImageURL()).into(holder.profile_image);
         }

@@ -1,7 +1,5 @@
 package hcmute.edu.vn.zalo_04;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -16,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -56,10 +53,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,7 +64,6 @@ import java.util.Objects;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.MyInterface.IReleaseStorage;
 import hcmute.edu.vn.zalo_04.adapter.MessageAdapter;
-import hcmute.edu.vn.zalo_04.model.Audio;
 import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.model.Image;
 import hcmute.edu.vn.zalo_04.model.User;
@@ -258,7 +251,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                 User user = snapshot.getValue(User.class);
                 username.setText(user.getUsername());
                 if (user.getImageURL().equals("default")){
-                    profile_image.setImageResource(R.drawable.user_hao);
+                    profile_image.setImageResource(R.drawable.user_hao2);
                 } else {
                     Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
                 }

@@ -9,11 +9,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,17 +28,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import hcmute.edu.vn.zalo_04.MessageActivity;
 import hcmute.edu.vn.zalo_04.PlayAudioActivity;
 import hcmute.edu.vn.zalo_04.R;
 import hcmute.edu.vn.zalo_04.ShowImageActivity;
 import hcmute.edu.vn.zalo_04.model.Chat;
-import hcmute.edu.vn.zalo_04.model.User;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
@@ -168,7 +163,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         //hien thi anh dai dien
         if (imageURL.equals("default")){
-            holder.profile_image2.setImageResource(R.drawable.user_hao);
+            holder.profile_image2.setImageResource(R.drawable.user_hao2);
         } else {
             Glide.with(context).load(imageURL).into(holder.profile_image2);
         }
@@ -196,7 +191,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private void setUI_TextType(Chat chat, MessageViewHolder holder){
         holder.show_message.setText(chat.getMessage());
         if (imageURL.equals("default")){
-            holder.profile_image.setImageResource(R.drawable.user_hao);
+            holder.profile_image.setImageResource(R.drawable.user_hao2);
         } else {
             Glide.with(context).load(imageURL).into(holder.profile_image);
         }
@@ -205,7 +200,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private void setUI_AudioType(Chat chat, MessageViewHolder holder){
 
         if (imageURL.equals("default")){
-            holder.profile_image1.setImageResource(R.drawable.user_hao);
+            holder.profile_image1.setImageResource(R.drawable.user_hao2);
         } else {
             Glide.with(context).load(imageURL).into(holder.profile_image1);
         }

@@ -1,22 +1,16 @@
 package hcmute.edu.vn.zalo_04.fragment;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,13 +46,15 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.R;
 import hcmute.edu.vn.zalo_04.SetDeleteTimelineActivity;
+import hcmute.edu.vn.zalo_04.model.Timeline;
 import hcmute.edu.vn.zalo_04.model.User;
+import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class AccountFragment extends Fragment {
 
     private View view;
-    private TextView tv_userName, tv_address;
-    private EditText edit_phone, edit_address;
+    private TextView tv_userName, tv_address, edit_email, release_time;
+    private EditText  edit_phone, edit_address;
     private Button btnUpdate, btn_change_pass, btn_edit_info;
 
     private ImageView img_logout;
@@ -81,6 +77,8 @@ public class AccountFragment extends Fragment {
     private ActivityResultLauncher<String> uploadPhoto;
 
     private User currentUser;
+
+    private Timeline timeline_root;
 
     public AccountFragment() {
 
@@ -120,9 +118,10 @@ public class AccountFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 currentUser = snapshot.getValue(User.class);
-                tv_userName.setText(currentUser.getUsername());
+                //tv_userName.setText(currentUser.getUsername());
+                setInfoAccount(currentUser, firebaseUser.getEmail());
                 if (currentUser.getImageURL().equals("default")){
-                    profile_img.setImageResource(R.drawable.user_hao);
+                    profile_img.setImageResource(R.drawable.user_hao2);
                 } else {
                     if (getContext() == null) {
                         return;
@@ -166,9 +165,24 @@ public class AccountFragment extends Fragment {
         });
 
         btn_change_pass.setOnClickListener(View -> {
-            //CreateData createData = new CreateData();
-            //createData.deleteDB();
-            //onClickGoToChangePass(user);
+            /*String email = send_email.getText().toString();
+
+            if (email.equals("")){
+                Toast.makeText(ResetPasswordActivity.this, "All fileds are required", Toast.LENGTH_SHORT).show();
+            } else {
+                firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(ResetPasswordActivity.this, "Please check your Email", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(ResetPasswordActivity.this, LoginActivity.class));
+                        } else {
+                            String error = task.getException().getMessage();
+                            Toast.makeText(ResetPasswordActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }*/
         });
 
         btn_edit_info.setOnClickListener(View ->{
@@ -201,6 +215,38 @@ public class AccountFragment extends Fragment {
                         }
                     }
                 });
+        readTimeline();
+    }
+
+    public void readTimeline(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TimelineList").child(firebaseUser.getUid());
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                timeline_root = snapshot.getValue(Timeline.class);
+
+                if (timeline_root != null){
+                    TimeUtil timeUtil = new TimeUtil();
+                    int day_num = Integer.parseInt(timeline_root.getDay_num());
+                    int month_num = Integer.parseInt(timeline_root.getMonth_num());
+                    int year_num =Integer.parseInt(timeline_root.getYear_num());
+                    String delete_time_point = timeUtil.up_downTime(TimeUtil.getTimeNow(),
+                            day_num, month_num, year_num);
+                    release_time.setText("Release point: " + delete_time_point);
+                } else {
+                    //timeline = new Timeline(firebaseUser.getUid(), "0", "0", "0");
+                    release_time.setText("You have not set resource release time");
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void openImage() {
@@ -210,6 +256,7 @@ public class AccountFragment extends Fragment {
         startActivityForResult(intent, IMAGE_REQUEST);
     }
 
+    //Bắt sự kiện chỉnh sửa profile
     void onClickEdit(){
         if (btn_edit_info.getText().toString().equals("Edit")) {
             btn_edit_info.setText("Save");
@@ -240,15 +287,17 @@ public class AccountFragment extends Fragment {
         }
     }
 
-    public void setInfoAccount(String username) {
+    public void setInfoAccount(User user, String email) {
 
-        tv_userName.setText(username);
+        tv_userName.setText(user.getUsername());
+        edit_email.setText(email);
+        edit_phone.setText(user.getPhone_number());
 //        us = sv;
 //        if(txtHoTen != null){
 //            setInfoSinhVien2();
 //        }
-        System.out.println("Day la ham setInfo-");
-        System.out.println("Đây la giá trị txtHoTen khi bắt đầu vào setInfo " + tv_userName);
+        //System.out.println("Day la ham setInfo-");
+        //System.out.println("Đây la giá trị txtHoTen khi bắt đầu vào setInfo " + tv_userName);
     }
 
 
@@ -264,11 +313,19 @@ public class AccountFragment extends Fragment {
         tv_userName= view.findViewById(R.id.tv_username_profile);
         tv_address = view.findViewById(R.id.tv_address);
         btn_edit_info = view.findViewById(R.id.btn_edit_info_profile);
+        edit_email = view.findViewById(R.id.email_profile);
         edit_phone = view.findViewById(R.id.edit_phone_number_profile);
         edit_address = view.findViewById(R.id.edit_address_profile);
         img_logout = view.findViewById(R.id.img_logout);
 
+        release_time = view.findViewById(R.id.release_time);
+
         layout = view.findViewById(R.id.rellay1);  //specify here Root layout Id
+    }
+
+
+    private void getReleaseTime(){
+
     }
 
     private String getFileExtension(Uri uri){

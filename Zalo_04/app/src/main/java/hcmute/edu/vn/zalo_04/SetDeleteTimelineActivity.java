@@ -70,7 +70,7 @@ public class SetDeleteTimelineActivity extends AppCompatActivity {
 
 
             if (day_num < 0 || day_num > 31|| month_num < 0 || month_num > 12 || year_num < 0){
-                Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Invalid input, 0<=day<31 ; 0<=month<13 ; year>0", Toast.LENGTH_SHORT).show();
             } else {
                 TimeUtil timeUtil = new TimeUtil();
                 try {
@@ -81,7 +81,7 @@ public class SetDeleteTimelineActivity extends AppCompatActivity {
                                 String.valueOf(month_num), String.valueOf(year_num));
                         saveInfoTimeline(timeline);
                     } else {
-                        Toast.makeText(this, "Invalue input",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Invalue input1",Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e){
                     e.printStackTrace();

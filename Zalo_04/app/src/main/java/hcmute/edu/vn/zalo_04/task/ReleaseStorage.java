@@ -28,27 +28,41 @@ import hcmute.edu.vn.zalo_04.model.FriendList;
 import hcmute.edu.vn.zalo_04.model.Image;
 import hcmute.edu.vn.zalo_04.model.Timeline;
 import hcmute.edu.vn.zalo_04.util.TimeUtil;
-
+// Class đảm nhiệm nhiệm vụ giải phóng tài nguyên dựa vào thời gian do người dùng đặt
 public class ReleaseStorage implements IReleaseStorage{
 
+    //Biến thời gian hiện tại
     private String timeNow;
 
+    //Biến lấy khoảng thời gian xoá tính bằng ngày do người dùng đặt >0 và <31
     private int day;
+
+    //Biến lấy khoảng thời gian xoá tính bằng tháng do người dùng đặt >0 và <13
     private int month;
+
+    //Biến lấy khoảng thời gian xoá tính bằng năm do người dùng đặt >0
     private int year;
 
+    //Dạng dữ liệu chứa 3 thông tin ngày tháng năm ở trên từ Firebase
     private Timeline timeline_root;
 
+    //Biến lưu người dùng hiện tại
     private FirebaseUser firebaseUser;
+
+    //Ánh xạ Storage của firebase
     private StorageReference storageReference;
 
+    //Dùng để hiển thị thông báo
     private Context context;
 
+    //Hàm khai báo
     public ReleaseStorage(FirebaseUser firebaseUser, Context context) {
         this.firebaseUser = firebaseUser;
         this.context = context;
 
     }
+
+    //Hàm lấy thông tin thời gian xoá dữ liệu do người dùng đặt được lưu trên Firebase
     public void readTimeline(){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TimelineList").child(firebaseUser.getUid());
 
@@ -74,6 +88,7 @@ public class ReleaseStorage implements IReleaseStorage{
         });
     }
     @Override
+    //Hàm thực thi các công việc xoá dữu liệu khi đã lấy được thời gian do người dùng đặt trên firebase
     public void getTimelineOK() {
         Log.d("TIMELINE", "apply");
         if(timeline_root == null){
@@ -85,10 +100,12 @@ public class ReleaseStorage implements IReleaseStorage{
     }
 
     @Override
+    //Hàm ghi log lại khi đã hoàn thành việc giải phóng tài nguyên
     public void releaseFinish() {
         Log.d("TIMELINE", "release finish!");
     }
 
+    //Hàm chỉ định đọc thời gian xoá tài nguyên của người dùng đặt, kiêm tra và ghi log thông tin Timeline nếu bị null
     public void deleteResource(){
         readTimeline();
 
@@ -98,6 +115,7 @@ public class ReleaseStorage implements IReleaseStorage{
         }
     }
 
+    //Hàm xoá ảnh
     public void deleteImage(Timeline timeline){
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("ImageList").child(firebaseUser.getUid());
@@ -112,12 +130,13 @@ public class ReleaseStorage implements IReleaseStorage{
                     fileList.add(image);
                 }
                 Log.d("fileList","size fileList:"+fileList.size());
+
+                day = Integer.parseInt(timeline.getDay_num());
+                month = Integer.parseInt(timeline.getMonth_num());
+                year = Integer.parseInt(timeline.getYear_num());
+
                 for (Image image : fileList){
                     TimeUtil timeUtil = new TimeUtil();
-
-                    day = Integer.parseInt(timeline.getDay_num());
-                    month = Integer.parseInt(timeline.getMonth_num());
-                    year = Integer.parseInt(timeline.getYear_num());
 
                     Log.d("TIMELINE","day:"+day +"--month:+"+month+"--year:"+year);
 
@@ -135,7 +154,7 @@ public class ReleaseStorage implements IReleaseStorage{
         });
 
     }
-
+    //Hàm xoá Audio
     public void deleteAudio(Timeline timeline){
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("AudioList").child(firebaseUser.getUid());
@@ -150,12 +169,13 @@ public class ReleaseStorage implements IReleaseStorage{
                     fileList.add(audio);
                 }
                 Log.d("fileList","size fileList:"+fileList.size());
+
+                day = Integer.parseInt(timeline.getDay_num());
+                month = Integer.parseInt(timeline.getMonth_num());
+                year = Integer.parseInt(timeline.getYear_num());
+
                 for (Audio audio : fileList){
                     TimeUtil timeUtil = new TimeUtil();
-
-                    day = Integer.parseInt(timeline.getDay_num());
-                    month = Integer.parseInt(timeline.getMonth_num());
-                    year = Integer.parseInt(timeline.getYear_num());
 
                     if (timeUtil.is_OutOfDate(audio.getTime(), timeUtil.up_downTime(TimeUtil.getTimeNow(),day ,month,year))){
                         deleteAudioFile(audio.getFilename());
@@ -173,6 +193,7 @@ public class ReleaseStorage implements IReleaseStorage{
 
     }
 
+    //Hàm xoá thông tin của ảnh, tin nhắn trong realtime-database (Mục ImageList và Chats)
     private void deleteChatInfoImage(Image image){
 
         DatabaseReference reference_info = FirebaseDatabase.getInstance().getReference().child("ImageList")
@@ -201,6 +222,7 @@ public class ReleaseStorage implements IReleaseStorage{
         });
     }
 
+    //Hàm xoá thông tin của audio, tin nhắn trong realtime-database (Mục AudioList và Chats)
     private void deleteChatInfoAudio(Audio audio){
         DatabaseReference reference_info = FirebaseDatabase.getInstance().getReference().child("AudioList")
                 .child(firebaseUser.getUid())
@@ -228,6 +250,7 @@ public class ReleaseStorage implements IReleaseStorage{
         });
     }
 
+    //Xoá file ảnh trong storage của Firebase
     private void deleteImageFile(String filename){
         storageReference = FirebaseStorage.getInstance().getReference("uploads").child("image");
 
@@ -254,6 +277,7 @@ public class ReleaseStorage implements IReleaseStorage{
 
     }
 
+    //Xoá file audio trong storage của Firebase
     private void deleteAudioFile(String filename){
         storageReference = FirebaseStorage.getInstance().getReference("uploads").child("audio");
 

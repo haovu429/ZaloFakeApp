@@ -21,6 +21,7 @@ public class TimeUtil {
     // SimpleDateFormat converts the
     // string format to date object
 
+    //Hàm lấy thời gian hiện tại dạng String
     public static String getTimeNow(){
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         //khai báo đối tượng current thuộc class LocalDateTime
@@ -35,7 +36,9 @@ public class TimeUtil {
     }
 
 
+    //Hàm so sánh sự chênh lệch ngày giữa hai khoảng thời gian dạng String
     public static long findDifferenceDay(String start_date, String end_date){
+        //Định dạng kiểu thời gian dạng String
         SimpleDateFormat sdf
                 = new SimpleDateFormat(
                 "dd-MM-yyyy HH:mm:ss");
@@ -72,7 +75,7 @@ public class TimeUtil {
         return -1;
     }
 
-
+    //Hàm so sánh sự khác biệt giữa hai khoảng thời gian dạng String (Tham khảo hàm tiện ích có sẵn trên internet)
     public void findDifference(String start_date,
                                String end_date)
     {
@@ -148,6 +151,7 @@ public class TimeUtil {
         }
     }
 
+    //Hàm xét xem mốc thời gian 1 có nằm trước mốc thời gian 2 hay không nếu có trả về true, nếu không thì trả về false
     public boolean is_OutOfDate(String time, String timeline){
         if ( findDifferenceDay(time, timeline) > 0){
             return true;
@@ -155,11 +159,19 @@ public class TimeUtil {
         return false;
     }
 
+    //Hàm tịnh tiến thời gian, tăng giảm số ngày, tháng, năm của một thời điểm và trả ra mốc thời gian tịnh tiến
     public String up_downTime(String time, int date_num, int month_num, int year_num) {
         // Định dạng thời gian
+        //Định dạng thơig fian cho thời gian tịnh tiên
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        //Định dạng ngày để rút ra tháng trong nột mốc thời gian
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd");
+
+        //Định dạng tháng để rút ra tháng trong nột mốc thời gian
         SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+
+        //Định dạng năm để rút ra tháng trong nột mốc thời gian
         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
 
 
@@ -260,6 +272,7 @@ public class TimeUtil {
         return dateFormat.format(c1.getTime());
     }
 
+    //Lấy tổng số ngày của một tháng
     private int dayOfMonth(int month, int year){
         switch (month) {
             case 1:

@@ -25,6 +25,7 @@ public class MainPagerAdapter extends FragmentStateAdapter {
 
     @NonNull
     @Override
+    //Khời tạo fragment cho trang chính
     public Fragment createFragment(int position) {
         switch (position){
             case 1:

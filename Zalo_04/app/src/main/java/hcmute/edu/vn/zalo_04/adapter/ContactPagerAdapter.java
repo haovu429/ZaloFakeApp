@@ -27,6 +27,7 @@ public class ContactPagerAdapter extends FragmentStateAdapter {
 
     @NonNull
     @Override
+    // Khỏi tạo fragment cho tab Contact
     public Fragment createFragment(int position) {
         switch (position){
             case 1:

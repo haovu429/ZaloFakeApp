@@ -36,18 +36,20 @@ import hcmute.edu.vn.zalo_04.model.User;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    //Lưu id người dùng hiện tại
     private String currentUserId;
 
-    private Context context;
+    //Sử dụng activity để laod ảnh bằng thư viện Glide
     private Activity activity;
-    private List<User> userList;
-    private boolean ischat;
-    private DatabaseReference reference;
-    private String theLastMessage;
-    private boolean isfriend;
+    private List<User> userList; //Danh sách người dùng trong adapter
+    private boolean ischat; //Trạng thái có đang xem boxchat hay không
+    private DatabaseReference reference; //Ánh xạ tới Firebase database
+    private String theLastMessage; //Tin nhắn cuối cùng trong box chat
+    private boolean isfriend; //Kiểm tra tài khoản có phải là bạn với người dùng hay chưa
 
-    private IClickAddFriend iClickAddFriend;
+    private IClickAddFriend iClickAddFriend; // Khai báo sự kiện kết bạn
 
+    //Hàm khởi tạo adapter
     public UserAdapter(Activity activity, List<User> userList, boolean ischat, boolean isfriend) {
         //this.context = context;
         this.activity = activity;
@@ -56,7 +58,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         this.isfriend = isfriend;
         notifyDataSetChanged();
     }
-
+    //Hàm set dữ liệu cho adapter
     public void setData(List<User> userList){
         this.userList = userList;
         notifyDataSetChanged();
@@ -65,12 +67,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     @NonNull
     @Override
+    //Hàm khởi tạo view
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
         return new UserViewHolder(view);
     }
 
     @Override
+    //Hàm đổ dữ liệu vào view
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
         if (user == null){
@@ -152,6 +156,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         });
 
     }
+    //Hàm load lại activity nếu như xảy ra lỗi khi kiêm tra tin nhắn cuối cùng
     private void refreshActivity(){
         activity.finish();
         activity.startActivity(activity.getIntent());
@@ -159,13 +164,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
 
     @Override
+    //Lấy số lượng danh sách dữ liệu của adapter
     public int getItemCount() {
         if (userList != null){
             return  userList.size();
         }
         return 0;
     }
-
+    //Tạo một lớp view holder tuỳ chỉnh để hiển thị User
     class UserViewHolder extends RecyclerView.ViewHolder {
 
         private CircleImageView profile_image;
@@ -249,6 +255,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     }
 
+    //Lấy ra tin nhắn cuối cùng, nếu như là hình ảnh hay audio thì sẽ hiện "File", còn text thì sẽ hiện text
     private String getLastMess(String input){
         if (input.equals("default")){
             return "No Message";
@@ -261,6 +268,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
     }
 
+    //Thêm một người vào danh sách bạn bè
     private void addFriendList(String added_userId){
         //add user to message fragment
         DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("FriendList")
@@ -299,19 +307,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             }
         });
     }
-
+    //Lấy id của người dùng hiện tại
     public String getCurrentUserId() {
         return currentUserId;
     }
 
+    //hàm set Id người dùng hiện tại cho adapter
     public void setCurrentUserId(String currentUserId) {
         this.currentUserId = currentUserId;
     }
 
+    //Hàm lấy ra sự kiện kết bạn (Interface)
     public IClickAddFriend getiClickAddFriend() {
         return iClickAddFriend;
     }
 
+    //Hàm set sự kiện kết bạn( Interface)
     public void setiClickAddFriend(IClickAddFriend iClickAddFriend) {
         this.iClickAddFriend = iClickAddFriend;
     }

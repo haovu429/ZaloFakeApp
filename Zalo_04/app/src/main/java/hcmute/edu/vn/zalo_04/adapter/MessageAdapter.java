@@ -35,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.zalo_04.PlayAudioActivity;
 import hcmute.edu.vn.zalo_04.R;
 import hcmute.edu.vn.zalo_04.ShowImageActivity;
+import hcmute.edu.vn.zalo_04.ShowVideoActivity;
 import hcmute.edu.vn.zalo_04.model.Chat;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
@@ -103,25 +104,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.layout_type_text.setVisibility(View.VISIBLE);
                 holder.layout_type_image.setVisibility(View.GONE);
                 holder.layout_type_audio.setVisibility(View.GONE);
+                holder.layout_type_video.setVisibility(View.GONE);
                 setUI_TextType(chat, holder);
                 break;
             case MSG_TYPE_IMAGE:
                 holder.layout_type_text.setVisibility(View.GONE);
                 holder.layout_type_image.setVisibility(View.VISIBLE);
                 holder.layout_type_audio.setVisibility(View.GONE);
+                holder.layout_type_video.setVisibility(View.GONE);
                 setUI_ImageType(chat, holder);
                 break;
             case MSG_TYPE_AUDIO:
                 holder.layout_type_text.setVisibility(View.GONE);
                 holder.layout_type_image.setVisibility(View.GONE);
                 holder.layout_type_audio.setVisibility(View.VISIBLE);
-
+                holder.layout_type_video.setVisibility(View.GONE);
                 setUI_AudioType(chat, holder);
                 break;
             case MSG_TYPE_VIDEO:
                 holder.layout_type_text.setVisibility(View.GONE);
                 holder.layout_type_image.setVisibility(View.GONE);
                 holder.layout_type_audio.setVisibility(View.GONE);
+                holder.layout_type_video.setVisibility(View.VISIBLE);
+                setUI_VideoType(chat, holder);
                 break;
             default:
                 holder.layout_type_text.setVisibility(View.VISIBLE);
@@ -216,6 +221,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         });
     }
 
+    private void setUI_VideoType(Chat chat, MessageViewHolder holder) {
+        if (imageURL.equals("default")){
+            holder.profile_image3.setImageResource(R.drawable.user_hao2);
+        } else {
+            Glide.with(context).load(imageURL).into(holder.profile_image3);
+        }
+
+        holder.type_file1.setText("Video");
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ShowVideoActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("videoUrl", chat.getVideo());
+                intent.putExtras(bundle);
+                context.startActivity(intent);
+            }
+        });
+    }
+
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
         private CircleImageView profile_image, profile_image1, profile_image2, profile_image3;
@@ -228,6 +254,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         private ImageView image_sent;
         private LinearLayout layout_type_audio;
+        private LinearLayout layout_type_video;
         private RelativeLayout layout_type_text;
         private LinearLayout layout_type_image;
 
@@ -245,10 +272,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             layout_type_image = (LinearLayout) itemView.findViewById(R.id.layout_type_image);
             layout_type_text = (RelativeLayout) itemView.findViewById(R.id.layout_type_text);
             layout_type_audio = (LinearLayout) itemView.findViewById(R.id.layout_item_audio);
+            layout_type_video = (LinearLayout) itemView.findViewById(R.id.layout_item_video);
 
             type_file1 = (TextView) itemView.findViewById(R.id.type_file1);
             profile_image1 = (CircleImageView) itemView.findViewById(R.id.profile_image1);
             profile_image2 = (CircleImageView) itemView.findViewById(R.id.profile_image2);
+            profile_image3 = (CircleImageView) itemView.findViewById(R.id.profile_image3);
 
             image_sent = (ImageView) itemView.findViewById(R.id.image_sent);
         }

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -105,6 +107,9 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     private ActivityResultLauncher<Intent> takePhoto;
     private ActivityResultLauncher<String> uploadPhoto;
 
+    private ActivityResultLauncher<Intent> pickVideoFromCamera;
+    private ActivityResultLauncher<Intent> pickVideoFromGallery;
+
     private boolean refresh = false;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -114,6 +119,12 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     private static final int CAMERA_REQUEST_CODE = 102;
     private String[] cameraPermissions;
 
+    private static final int VIDEO_PICK_GALLERY_CODE = 100;
+    private static final int VIDEO_PICK_CAMERA_CODE = 101;
+    private static final int VIDEO_CAMERA_REQUEST_CODE = 102;
+    private String[] videoCameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private Uri videoUri;
+    private ProgressDialog videoProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +197,10 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
             popupMenu.show();
         });
 
+        videoProgressDialog = new ProgressDialog(this);
+        videoProgressDialog.setTitle("Vui lòng đợi...");
+        videoProgressDialog.setMessage("Uploading video...");
+        videoProgressDialog.setCanceledOnTouchOutside(false);
 
         img_video.setOnClickListener(View -> {
             PopupMenu popupMenu = new PopupMenu(this, View);
@@ -194,16 +209,19 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
-                        case R.id.item_video_exists:
-                            //test choi
-                            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/channel/UC5GCMUwYXZTMKVc8OBvLbvQ")));
+                        case R.id.item_video_exists: // Pick video from gallery
+                            Intent intent = new Intent();
+                            intent.setType("video/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            pickVideoFromGallery.launch(Intent.createChooser(intent, "Chọn video"));
                             return true;
-                        case R.id.item_create_video:
-                            Intent intent = new Intent(MessageActivity.this, SendAudioActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("userId", userId);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
+                        case R.id.item_create_video: // Pick video from camera
+                            if (!CheckCameraPermission()) {
+                                Video_RequestCameraPermission();
+                            } else {
+                                Intent intent1 = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                                pickVideoFromCamera.launch(intent1);
+                            }
                             return true;
                         case R.id.item_photo_exists:
                             uploadPhoto.launch("image/*");
@@ -266,6 +284,35 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         });
         seenMessage(userId);
 
+        pickVideoFromCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == RESULT_OK) {
+                    videoUri = result.getData().getData();
+                    if (videoUri != null) {
+                        Video_UploadToFirebase();
+                        videoUri = null; // Reset
+                    } else {
+                        Toast.makeText(MessageActivity.this, "Không có video được chọn", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+        pickVideoFromGallery = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == RESULT_OK) {
+                    videoUri = result.getData().getData();
+                    if (videoUri != null) {
+                        Video_UploadToFirebase();
+                        videoUri = null; // Reset
+                    } else {
+                        Toast.makeText(MessageActivity.this, "Không có video được chọn", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
         takePhoto = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
             @Override
@@ -293,6 +340,10 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                         }
                     }
                 });
+    }
+
+    private void Video_RequestCameraPermission() {
+        ActivityCompat.requestPermissions(this, videoCameraPermissions, VIDEO_CAMERA_REQUEST_CODE);
     }
     private void RequestCameraPermission() {
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -607,4 +658,82 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     public void releaseFinish() {
         this.refresh = false;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case VIDEO_CAMERA_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted && storageAccepted) {
+                    } else {
+                        Toast.makeText(this, "Camera & Storage permission are required", Toast.LENGTH_LONG).show();
+                    }
+                }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void Video_UploadToFirebase() {
+        videoProgressDialog.show();
+        String fileName = String.format("video%d", System.currentTimeMillis());
+        String filePath = String.format("uploads/videos/%s", fileName);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference(filePath);
+        storageReference.putFile(videoUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!uriTask.isSuccessful()) ;
+                        Uri downloadUri = uriTask.getResult();
+                        String timeNow = TimeUtil.getTimeNow();
+                        if (uriTask.isSuccessful()) {
+                            // Send chat message for video
+                            Chat chat = new Chat(firebaseUser.getUid(), userId, false);
+                            chat.setVideo(downloadUri.toString());
+                            chat.setTime(timeNow);
+                            chat.setIdfile(fileName);
+                            sendMessage(chat);
+
+                            // Add video detail to firebase database (Realtime Database)
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("id", fileName);
+                            hashMap.put("sender", firebaseUser.getUid());
+                            hashMap.put("receiver", userId);
+                            hashMap.put("time", timeNow);
+                            hashMap.put("filename", downloadUri);
+
+                            // TODO: Error when add video detail to database
+//                            DatabaseReference reference = FirebaseDatabase.getInstance("https://zalo-04-default-rtdb.firebaseio.com/").getReference("VideoList")
+//                                    .child(firebaseUser.getUid())
+//                                    .child(fileName);
+//                            reference.setValue(hashMap)
+//                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void unused) {
+//                                            videoProgressDialog.dismiss();
+//                                            Toast.makeText(MessageActivity.this, "Video uploaded.", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            videoProgressDialog.dismiss();
+//                                            Toast.makeText(MessageActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+//                                        }
+//                                    });
+                            videoProgressDialog.dismiss();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        videoProgressDialog.dismiss();
+                        Toast.makeText(MessageActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
 }

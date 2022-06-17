@@ -2,15 +2,15 @@ package hcmute.edu.vn.zalo_04.model;
 
 public class Chat {
 
-    private String sender;
-    private String receiver;
-    private String message = "None";
-    private String video = "None";
-    private String audio = "None";
-    private String image = "None";
-    private String time;
-    private boolean isseen;
-    private String idfile = "None";
+    private String sender; //id người gửi audio
+    private String receiver; //id người nhận audio
+    private String message = "None"; //Nội dung dạng tin nhắn text
+    private String video = "None"; //Link video trên storage
+    private String audio = "None"; // Link audio trên storage
+    private String image = "None"; //Link hình ảnh trên storage
+    private String time; // Thời gian gửi tin nhắn
+    private boolean isseen; //Trạng thái xem tin nhắn của người nhận
+    private String idfile = "None"; //Tên file trên storage nếu tin nhắn là dạng video, audio, image
 
     public Chat(String sender, String receiver, String message, String video, String audio, boolean isseen) {
         this.sender = sender;

@@ -1,8 +1,8 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class Contact {
-    private String name;
-    private String phone_number;
+    private String name; //Tên danh bạ của số điện thoại trong danh bạ điện thoại
+    private String phone_number; // Số điện thoại trong danh bạ điện thoại
 
     public Contact(String name, String phone_number) {
         this.name = name;

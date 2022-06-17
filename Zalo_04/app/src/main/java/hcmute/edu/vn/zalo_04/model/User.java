@@ -2,12 +2,12 @@ package hcmute.edu.vn.zalo_04.model;
 
 public class User {
 
-    private String id;
-    private String username;
-    private String imageURL;
-    private String phone_number;
-    private String status;
-    private String search;
+    private String id; // id người tài khoản người dùng trong hệ thống
+    private String username; //Tên người dùng trong hệ thống
+    private String imageURL; //Link ảnh người dùng
+    private String phone_number; //Số điện thoại đă đăng ký
+    private String status; // Trạng thái người dùng hoạt động
+    private String search; // Tên thay thế của người dùng khi search (Vì trên firebase không có chức năng search cả chữ hoa và thường)
 
 
     public User(String id, String username, String imageURL, String phone_number, String status, String search) {

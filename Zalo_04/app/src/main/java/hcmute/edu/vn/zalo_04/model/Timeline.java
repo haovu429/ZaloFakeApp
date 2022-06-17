@@ -1,10 +1,10 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class Timeline {
-    String id;
-    String day_num;
-    String month_num;
-    String year_num;
+    String id; //id người dùng đặt thời gian xoá tài nguyên
+    String day_num; // khoảng thời gian số ngày mà người dùng muốn xoá trước thời điểm hiện tại
+    String month_num; // khoảng thời gian số tháng mà người dùng muốn xoá trước thời điểm hiện tại
+    String year_num; // khoảng thời gian số năm mà người dùng muốn xoá trước thời điểm hiện tại
 
     public Timeline(String id, String day_num, String month_num, String year_num) {
         this.id = id;

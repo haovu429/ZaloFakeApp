@@ -1,11 +1,11 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class ItemChatUI {
-    private Integer id;
-    private Integer img_id;
-    private String title;
-    private String last_time;
-    private String last_message;
+    private Integer id; //id của người chat cùng người đã chat cùng
+    private Integer img_id; //Hình ảnh của người đã chat cùng
+    private String title; //Tên của người đã chat cùng (hiển thị trong message fragment)
+    private String last_time; // Thời gian tin nhắn cuối dùng được gửi
+    private String last_message; //Nội dung tin nhắn cuối dùng
 
     public ItemChatUI(Integer id, Integer img_id, String title) {
         this.id = id;

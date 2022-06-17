@@ -1,7 +1,7 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class FriendList {
-    private String id;
+    private String id; //id những tài khoản đã là bạn bè của một tài khoản người dùng
 
     public FriendList(String id) {
         this.id = id;

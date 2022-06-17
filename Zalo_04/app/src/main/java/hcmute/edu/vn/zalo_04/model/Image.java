@@ -1,11 +1,11 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class Image {
-    private String id;
-    private String sender;
-    private String receiver;
-    private String time;
-    private String filename;
+    private String id; //id hình ảnh
+    private String sender; //id tài khoản người gửi
+    private String receiver; // id tài khoản người nhận
+    private String time; //Thời gian gửi ảnh
+    private String filename; //Tên file trong storage firebase
 
     public Image(String id, String sender, String receiver, String time, String filename) {
         this.id = id;

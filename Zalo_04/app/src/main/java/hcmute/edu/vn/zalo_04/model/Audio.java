@@ -1,11 +1,11 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class Audio {
-    private String id;
-    private String sender;
-    private String receiver;
-    private String time;
-    private String filename;
+    private String id; //Id audio
+    private String sender; //id người gửi audio
+    private String receiver; //id người nhận audio
+    private String time; //Thời gian gửi audio
+    private String filename; //Tên file audio có đuôi mở rộng
 
     public Audio(String id, String sender, String receiver, String time, String filename) {
         this.id = id;

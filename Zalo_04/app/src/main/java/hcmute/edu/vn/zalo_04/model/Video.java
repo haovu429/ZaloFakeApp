@@ -1,11 +1,11 @@
 package hcmute.edu.vn.zalo_04.model;
 
 public class Video {
-    private String id;
-    private String sender;
-    private String receiver;
-    private String time;
-    private String filename;
+    private String id; //id video
+    private String sender; // id người gửi video
+    private String receiver; // id người nhận video
+    private String time; //Thời gian gửi video
+    private String filename; //Tên file video trên storage
 
     public Video(String id, String sender, String receiver, String time, String filename) {
         this.id = id;

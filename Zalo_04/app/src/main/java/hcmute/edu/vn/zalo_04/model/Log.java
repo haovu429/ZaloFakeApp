@@ -1,9 +1,10 @@
 package hcmute.edu.vn.zalo_04.model;
 
+//Chức năng ghi lỗi hệ thống (chưa thực hiên hoàn thiện)
 public class Log {
-    private String tag;
-    private String error;
-    private String time;
+    private String tag; //Nhãn lỗi ghi trong hệ thống
+    private String error; //Nội dụng lỗi
+    private String time; //Thời gian xảy ra lỗi
 
     public Log(String tag, String error, String time) {
         this.tag = tag;

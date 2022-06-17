@@ -38,23 +38,23 @@ import hcmute.edu.vn.zalo_04.model.User;
 
 public class ContactFriendFragment extends Fragment {
 
-    private View view;
+    private View view; // View cho ContactFriendFragment
 
-    private ImageView img_find, img_qr_scan, img_add;
-    private TextView tv_find;
-    private RecyclerView rcv_friended;
+    private ImageView img_find, img_qr_scan, img_add; // ImageView cho tìm kiếm, quét QR, thêm friend
+    private TextView tv_find; // TextView tìm kiếm
+    private RecyclerView rcv_friended; // RecyclerView cho danh sách friend
 
-    private UserAdapter userAdapter;
-    private List<User> userList;
+    private UserAdapter userAdapter; // UserAdapter cho RecyclerView
+    private List<User> userList; // Danh sách User cho UserAdapter
 
-    private FirebaseUser firebaseUser;
-    private DatabaseReference reference;
+    private FirebaseUser firebaseUser; // FirebaseUser hiện tại đang đăng nhập
+    private DatabaseReference reference; // DatabaseReference cho Firebase
 
     //upgrade
     //private List<String> str_usersList;
     private List<FriendList> friendL_usersList;
 
-    private EditText search_users;
+    private EditText search_users; // EditText tìm kiếm user
 
     public ContactFriendFragment() {
         // Required empty public constructor
@@ -72,6 +72,7 @@ public class ContactFriendFragment extends Fragment {
         return view;
     }
 
+    // Setup UI cho ContactFriendFragment
     private void setupUI(){
         AnhXa();
 
@@ -124,6 +125,7 @@ public class ContactFriendFragment extends Fragment {
 
     }
 
+    // Tìm kiếm danh sách user
     private void searchUsers(String toString) {
 
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -165,13 +167,14 @@ public class ContactFriendFragment extends Fragment {
         });
     }
 
+    // Thêm vào danh sách friend (List<User> 'userList')
     private void addFriendList() {
         userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userList.clear();
+                userList.clear(); // Empty list
                 for (DataSnapshot snapshot_index : snapshot.getChildren()){
                     User user = snapshot_index.getValue(User.class);
                     for (FriendList friendList : friendL_usersList){
@@ -191,6 +194,7 @@ public class ContactFriendFragment extends Fragment {
         });
     }
 
+    // Mapping
     private void AnhXa(){
         img_find = view.findViewById(R.id.img_find);
         img_qr_scan = view.findViewById(R.id.img_qr_scan);

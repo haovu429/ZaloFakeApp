@@ -36,23 +36,23 @@ import hcmute.edu.vn.zalo_04.model.User;
 
 public class ContactOAFragment extends Fragment {
 
-    private View view;
+    private View view; // View của ContactOAFragment
 
-    private ImageView img_find, img_qr_scan, img_add;
-    private TextView tv_find;
-    private RecyclerView rcv_unfriended;
+    private ImageView img_find, img_qr_scan, img_add; // ImageView cho tìm kiếm, quét QR, thêm
+    private TextView tv_find; // TextView tìm kiếm
+    private RecyclerView rcv_unfriended; // RecyclerView for Unfriended List
 
-    private UserAdapter userAdapter;
-    private List<User> userList;
+    private UserAdapter userAdapter; // UserAdapter cho RecyclerView
+    private List<User> userList; // Danh sách User cho UserAdapter (tìm kiếm user)
 
-    private FirebaseUser firebaseUser;
-    private DatabaseReference reference;
+    private FirebaseUser firebaseUser; // FirebaseUser hiện tại đang đăng nhập
+    private DatabaseReference reference; // DatabaseReference cho Firebase
 
     //upgrade
     //private List<String> str_usersList;
     private List<FriendList> friendL_usersList;
 
-    private EditText search_users;
+    private EditText search_users; // EditText tìm kiếm user
 
 
     public ContactOAFragment() {
@@ -70,6 +70,8 @@ public class ContactOAFragment extends Fragment {
 
         return view;
     }
+
+    // Setup UI cho ContactOAFragment
     private void setupUI(){
 
         AnhXa();
@@ -117,6 +119,7 @@ public class ContactOAFragment extends Fragment {
 
     }
 
+    // Tìm kiếm danh sách user
     private void searchUsers(String toString) {
 
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -150,6 +153,7 @@ public class ContactOAFragment extends Fragment {
         });
     }
 
+    // TODO: Unused function
     private void addFriendList(String added_userId) {
         //add user to message fragment
         DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("FriendList")
@@ -171,7 +175,7 @@ public class ContactOAFragment extends Fragment {
         });
     }
 
-
+    // Mapping
     private void AnhXa(){
         img_find = view.findViewById(R.id.img_find);
         img_qr_scan = view.findViewById(R.id.img_qr_scan);

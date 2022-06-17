@@ -53,24 +53,24 @@ import hcmute.edu.vn.zalo_04.model.User;
 
 public class ContactGroupFragment extends Fragment {
 
-    public static final int RequestPermissionCode = 1;
+    public static final int RequestPermissionCode = 1; // Testing: Temporary
 
-    private Activity activity;
+    private Activity activity; // Activity của ContactGroupFragment
 
-    private View view;
-    private UserAdapter userAdapter;
-    private List<User> userList;
+    private View view; // View của ContactGroupFragment
+    private UserAdapter userAdapter; // UserAdapter cho RecyclerView
+    private List<User> userList; // Danh sách User cho UserAdapter (tìm kiếm user)
 
-    private List<User> contactHasJoined;
+    private List<User> contactHasJoined; // Danh sách User cho UserAdapter (not friend of user)
 
-    private RecyclerView rcv_contact_unfriended;
+    private RecyclerView rcv_contact_unfriended; // RecyclerView cho contact
 
-    private List<Contact> contactList;
-    private List<FriendList> friendL_usersList;
+    private List<Contact> contactList; // Danh sách Contact (from getPhoneContacts())
+    private List<FriendList> friendL_usersList; // Danh sách friend
 
-    private EditText search_users;
+    private EditText search_users; // EditText cho tìm kiếm user
 
-    private ActivityResultLauncher activityResultLauncher;
+    private ActivityResultLauncher activityResultLauncher; // Testing: Temporary unused
 
     //https://stackoverflow.com/questions/66475027/activityresultlauncher-with-requestmultiplepermissions-contract-doesnt-show-per
     final String[] PERMISSIONS = {
@@ -78,8 +78,8 @@ public class ContactGroupFragment extends Fragment {
             Manifest.permission.READ_CONTACTS
 
     };
-    private ActivityResultContracts.RequestMultiplePermissions multiplePermissionsContract;
-    private ActivityResultLauncher<String[]> multiplePermissionLauncher;
+    private ActivityResultContracts.RequestMultiplePermissions multiplePermissionsContract; // Contract for requesting multiple permissions
+    private ActivityResultLauncher<String[]> multiplePermissionLauncher; // Launcher for granting requested permissions
 
 
     public ContactGroupFragment() {
@@ -138,6 +138,7 @@ public class ContactGroupFragment extends Fragment {
         return view;
     }
 
+    // Setup UI cho ContactGroupFragment
     private void setupUI(){
         activity = getActivity();
 
@@ -174,6 +175,7 @@ public class ContactGroupFragment extends Fragment {
 
     }
 
+    // Lấy danh sách friend từ Firebase
     private void getFriendList(){
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -201,6 +203,7 @@ public class ContactGroupFragment extends Fragment {
         });
     }
 
+    // Tìm kiếm danh sách user
     private void searchUsers(String toString) {
 
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -261,7 +264,7 @@ public class ContactGroupFragment extends Fragment {
         });
     }
 
-
+    // Đọc users từ Firebase
     private void readUsers() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -323,7 +326,7 @@ public class ContactGroupFragment extends Fragment {
         });
     }
 
-    @SuppressLint("Range")
+    @SuppressLint("Range") // Lấy danh sách contacts từ danh bạ
     private List<Contact> getPhoneContacts() {
 
         List<Contact> contacts = new ArrayList<>();
@@ -400,6 +403,7 @@ public class ContactGroupFragment extends Fragment {
                 result2 == PackageManager.PERMISSION_GRANTED;
     }*/
 
+    // Check granted permissions
     private boolean hasPermissions(String[] permissions) {
         if (permissions != null) {
             for (String permission : permissions) {
@@ -414,6 +418,7 @@ public class ContactGroupFragment extends Fragment {
         return false;
     }
 
+    // Ask permissions to be granted
     private void askPermissions(ActivityResultLauncher<String[]> multiplePermissionLauncher) {
         if (!hasPermissions(PERMISSIONS)) {
             Log.d("PERMISSIONS", "Launching multiple contract permission launcher for ALL required permissions");

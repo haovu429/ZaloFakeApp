@@ -24,18 +24,18 @@ public class ContactFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "param1"; // Testing: Temporary
+    private static final String ARG_PARAM2 = "param2"; // Testing: Temporary
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mParam1; // Testing: Temporary
+    private String mParam2; // Testing: Temporary
 
-    TabLayout tabLayout;
-    ViewPager2 viewPager;
-    ContactPagerAdapter contactPagerAdapter;
+    TabLayout tabLayout; // TabLayout cho ContactFragment
+    ViewPager2 viewPager; // ViewPager để setAdapter ContactPagerAdapter
+    ContactPagerAdapter contactPagerAdapter; // Adapter của Contact liên lạc / danh bạ
 
-    View view;
+    View view; // View của ContactFragment
 
     public ContactFragment() {
         // Required empty public constructor

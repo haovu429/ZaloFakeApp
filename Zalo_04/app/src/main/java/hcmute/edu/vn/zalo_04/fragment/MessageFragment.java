@@ -33,17 +33,17 @@ import hcmute.edu.vn.zalo_04.model.User;
 
 public class MessageFragment extends Fragment {
 
-    private View view;
+    private View view; // View cho MessageFragment
 
-    private ImageView img_find, img_qr_scan, img_add;
-    private TextView tv_find;
-    private RecyclerView rcv_chat;
+    private ImageView img_find, img_qr_scan, img_add; // ImageView cho tìm kiếm, quét QR, thêm
+    private TextView tv_find; // TextView tìm kiếm
+    private RecyclerView rcv_chat; // RecyclerView for chat messages
 
-    private UserAdapter userAdapter;
-    private List<User> userList;
+    private UserAdapter userAdapter; // UserAdapter cho RecyclerView
+    private List<User> userList; // Danh sách User cho UserAdapter (chatList)
 
-    private FirebaseUser firebaseUser;
-    private DatabaseReference reference;
+    private FirebaseUser firebaseUser; // FirebaseUser hiện tại đang đăng nhập
+    private DatabaseReference reference; // DatabaseReference cho Firebase
 
     //upgrade
     //private List<String> str_usersList;
@@ -65,6 +65,7 @@ public class MessageFragment extends Fragment {
         return view;
     }
 
+    // Setup UI cho MessageFragment
     private void setupUI(){
         AnhXa();
 
@@ -135,6 +136,7 @@ public class MessageFragment extends Fragment {
 
     }
 
+    // Thêm danh sách chat (từ UserAdapter)
     private void addChatList() {
         userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -210,6 +212,7 @@ public class MessageFragment extends Fragment {
 
     }*/
 
+    // Mapping
     private void AnhXa(){
         img_find = view.findViewById(R.id.img_find);
         img_qr_scan = view.findViewById(R.id.img_qr_scan);
@@ -218,6 +221,7 @@ public class MessageFragment extends Fragment {
         rcv_chat =view.findViewById(R.id.rcv_chat);
     }
 
+    // TODO: Unused function (Testing get data)
     private List<ItemChatUI> getData(){
         List<ItemChatUI> itemChatUIList = new ArrayList<>();
         ItemChatUI itemChatUI1 = new ItemChatUI(R.drawable.user_hao2,"Hao dep trai dang doi ban rep.");

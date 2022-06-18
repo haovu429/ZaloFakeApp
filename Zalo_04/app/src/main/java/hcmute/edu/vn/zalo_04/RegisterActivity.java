@@ -6,7 +6,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -64,19 +67,36 @@ public class RegisterActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
+        phone_number.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                checkPhoneExists(editable.toString());
+            }
+        });
+
         btn_register.setOnClickListener(View -> {
             String txt_username = username.getText().toString();
             String txt_phone_number = phone_number.getText().toString();
             String txt_email = email.getText().toString();
             String txt_password = password.getText().toString();
             String txt_re_password = re_password.getText().toString();
-
+            //checkPhoneExists(txt_phone_number);
             if (TextUtils.isEmpty(txt_username) || TextUtils.isEmpty(txt_phone_number) || TextUtils.isEmpty(txt_email) ||
                     TextUtils.isEmpty(txt_password) || TextUtils.isEmpty(txt_re_password)){
                 Toast.makeText(RegisterActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
             } else if (txt_password.length() < 6){
                 Toast.makeText(RegisterActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
-            } else if (checkPhoneExists(txt_phone_number)){
+            } else if (phone_exists){
                 Toast.makeText(RegisterActivity.this, "Phone number existed", Toast.LENGTH_SHORT).show();
             } else if (!txt_password.equals(txt_re_password)){
                 Toast.makeText(RegisterActivity.this, "Re-password not match", Toast.LENGTH_SHORT).show();
@@ -136,6 +156,7 @@ public class RegisterActivity extends AppCompatActivity {
                     User user = snapshot_index.getValue(User.class);
                     if (user.getPhone_number().equals(phone_number)){
                         phone_exists = true;
+                        Log.d("errorP",phone_number);
                         break;
                     }
                 }
@@ -145,6 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             }
         });
+        Log.d("errorPLast",String.valueOf(phone_exists));
         return  phone_exists;
     }
 }

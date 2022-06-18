@@ -69,7 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
             String txt_phone_number = phone_number.getText().toString();
             String txt_email = email.getText().toString();
             String txt_password = password.getText().toString();
-            String txt_re_password = password.getText().toString();
+            String txt_re_password = re_password.getText().toString();
 
             if (TextUtils.isEmpty(txt_username) || TextUtils.isEmpty(txt_phone_number) || TextUtils.isEmpty(txt_email) ||
                     TextUtils.isEmpty(txt_password) || TextUtils.isEmpty(txt_re_password)){

@@ -30,17 +30,16 @@ import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class SetDeleteTimelineActivity extends AppCompatActivity {
 
-    private EditText day, month, year; //set
-    private Button set_time, exit, apply_now;
-    private int day_num = 0, month_num = 0, year_num = 0;
+    private EditText day, month, year;  //Khoảng thời gian người dùng muốn xoá tài nguyên từ thời điểm hiện tại theo ngày, tháng, năm
+    private Button set_time, exit, apply_now; // Nút cài thời gian, thoát, và áp dụng xoá tài nguyên
+    private int day_num = 0, month_num = 0, year_num = 0; // Lưu thồn tin ngày, tháng, năm người dùng cài
 
-    private FirebaseUser firebaseUser;
-    private FirebaseDatabase firebaseDatabase;
-    //private Reference reference;
+    private FirebaseUser firebaseUser; //Biến lưu người dùng hiện tại
 
-    private Timeline timeline;
+    private Timeline timeline; //Dạng dữ liệu chứa 3 thông tin ngày tháng năm mà người dùng đã cài
 
     @Override
+    //hàm khởi tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_delete_timeline);
@@ -102,6 +101,7 @@ public class SetDeleteTimelineActivity extends AppCompatActivity {
         });
     }
 
+    //hàm lưu thông tin thời gian xoá mà người dùng đã cài vào database
     private void saveInfoTimeline(Timeline timeline){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
@@ -115,6 +115,7 @@ public class SetDeleteTimelineActivity extends AppCompatActivity {
 
     }
 
+    //hàm đọc thông tin thời gian xoá tài nguyên nếu người dùng đã cài trước đó trên database
     public void readTimeline(){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TimelineList").child(firebaseUser.getUid());
 

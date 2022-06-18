@@ -40,24 +40,25 @@ import hcmute.edu.vn.zalo_04.task.ReleaseStorage;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Mã thứ tự cho các fragment
     private static final int FRAGMENT_MESSAGE = 0;
     private static final int FRAGMENT_CONTACT = 1;
     private static final int FRAGMENT_ACCOUNT = 2;
 
-    private int currentFragment = FRAGMENT_MESSAGE;
+    private int currentFragment = FRAGMENT_MESSAGE; //Mặc định là messageFragment
 
-    private int idUser;
 
-    CircleImageView profile_image;
-    TextView username;
+    CircleImageView profile_image; //Ảnh đại diện của tài khoản
+    TextView username; //Tên người dùng
 
-    FirebaseUser firebaseUser;
-    DatabaseReference reference;
+    FirebaseUser firebaseUser; //Biến lưu tài khoản đăng nhập hiện tại
+    DatabaseReference reference; //Ánh xạ tới DB firebase
 
-    ViewPager2 viewPager;
-    MainPagerAdapter mainPagerAdapter;
+    ViewPager2 viewPager; //Chưa dùng tới
+    MainPagerAdapter mainPagerAdapter; //Chưa dùng tới
 
     @Override
+    //Tạo view
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Cài đặt thuư viện bên ngoài "AHBottomNavigation"
         AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
         // Create items
@@ -171,12 +173,14 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(mainPagerAdapter);*/
     }
+    //Chuyển fragment
     private void replaceFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, fragment);
         fragmentTransaction.commit();
     }
 
+    //Mở fragment Message
     private void openMessageFragment(){
         if(currentFragment != FRAGMENT_MESSAGE){
             replaceFragment(new MessageFragment());
@@ -184,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Mở fragment Contact
     private void openContactFragment(){
         if(currentFragment != FRAGMENT_CONTACT){
             replaceFragment(new ContactFragment());
@@ -191,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Mở fragment Account
     private void openAccountFragment(){
         if(currentFragment != FRAGMENT_ACCOUNT){
             replaceFragment(new AccountFragment());
@@ -198,18 +204,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Anh xạ UI
     private void AnhXa(){
         profile_image = findViewById(R.id.profile_image);
         username = findViewById(R.id.username);
     }
 
     @Override
+    //Tạo menu
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
+    //Bắt sựu kiện cho menu
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.logout:
@@ -221,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    //Cập nhật trạng thái người dùng
     private void status(String status){
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -230,24 +240,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    //Tuỳ chỉnh hàm onResume để cập nhật trạng thái người dùng
     protected void onResume() {
         super.onResume();
         status("online");
     }
 
     @Override
+    //Tuỳ chỉnh hàm onPause để cập nhật trạng thái người dùng
     protected void onPause() {
         super.onPause();
         status("offline");
     }
 
     @Override
+    //Tuỳ chỉnh hàm onDestroy để cập nhật trạng thái người dùng
     protected void onDestroy() {
         super.onDestroy();
+        status("offline");
         Log.d("loi", "destroy");
     }
 
-    private void loadImageToUI(User user){
+/*    private void loadImageToUI(User user){
         while (true){
             try {
                 Glide.with(MainActivity.this).load(user.getImageURL()).into(profile_image);
@@ -257,6 +271,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-    }
+    }*/
 
 }

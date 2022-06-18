@@ -73,60 +73,77 @@ import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class MessageActivity extends AppCompatActivity implements IReleaseStorage {
 
+    //Ảnh đại diện của tài khoản cùng chat
     private CircleImageView profile_image;
+
+    //Tên tài khoản cùng chat
     private TextView username;
 
+    //Biến lưu người dùng hiện tại (Firebase)
     private FirebaseUser firebaseUser;
-    private DatabaseReference reference;
-    private MessageAdapter messageAdapter;
+    private DatabaseReference reference; //Ánh xạ Database
+    private MessageAdapter messageAdapter; //Khởi tạo adapter tin nhắn
 
-    private Intent intent;
-    private String userId;
+    private Intent intent; //TruyỀn, nhận dữ liệu giữa 2 activity
+    private String userId; //id người dùng của tài khoản cùng chat
 
-    private ImageButton btn_send;
+    private ImageButton btn_send; //button gửi tin nhắn
 
-    private EditText txt_send;
+    private EditText txt_send; //text box nhập tin nhắn
 
-    private List<Chat> chatList;
+    private List<Chat> chatList; //Danh sách tin nhắn
 
-    private RecyclerView rcv_chat;
+    private RecyclerView rcv_chat; //View hiển thị danh sách tin nhắn ra màn hình
 
-    private ValueEventListener seenListener;
+    private ValueEventListener seenListener; //Sự kiện tài khoản chat cùng đã xem tin nhắn mới nhất
 
-    private ImageView img_video, img_audio;
-    private String urlAudio;
+    private ImageView img_video, img_audio; // icon hiển thị kiểu file
+    private String urlAudio; //Link audio sau khi upload
 
-    private ProgressBar progressBar;
+    private ProgressBar progressBar; //Thanh tiến trình, sử dụng khi upload tài nguyên
 
-    private Uri imageUri;
-    private StorageTask uploadTask;
-    private StorageReference storageReference;
+    private Uri imageUri; // link ảnh
+    private StorageTask uploadTask; // Phương thức upload được Firebase hỗ trợ
+    private StorageReference storageReference; //Ánh xạ tới Storage trên fireabase
 
-    private RelativeLayout layout;
+    private RelativeLayout layout; //Quản lý màn hình, sử dụng để add thanh tiến trình vào màn hình
 
-    private ActivityResultLauncher<Intent> takePhoto;
-    private ActivityResultLauncher<String> uploadPhoto;
+    private ActivityResultLauncher<Intent> takePhoto; //Sự kiện chụp ảnh, mở màn hình chụp ảnh, trả về Intent
+    private ActivityResultLauncher<String> uploadPhoto; //Sự kiện chụp ảnh, mở màn hình chọn ảnh từ thư viện trả về đường dẫn ảnh
 
-    private ActivityResultLauncher<Intent> pickVideoFromCamera;
-    private ActivityResultLauncher<Intent> pickVideoFromGallery;
+    private ActivityResultLauncher<Intent> pickVideoFromCamera; //Sự kiện chụp video bằng camera, mở màn hình quay video
+    private ActivityResultLauncher<Intent> pickVideoFromGallery; //Sự kiện chọn video bằng từ thư viện, mở màn hình thư viện để chọn
 
-    private boolean refresh = false;
+    private boolean refresh = false; //Biến refresh lại giao diện
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    //static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    //Ảnh bitmap sau sự kiện chụp ảnh trả về
     private Bitmap bitmap;
 
+    //code yêu cầu quyền camera
     private static final int CAMERA_REQUEST_CODE = 102;
+
+    //Danh sách các quyền yêu cầu
     private String[] cameraPermissions;
 
     private static final int VIDEO_PICK_GALLERY_CODE = 100;
     private static final int VIDEO_PICK_CAMERA_CODE = 101;
+
+    //code yêu cầuf quyền Video, camera
     private static final int VIDEO_CAMERA_REQUEST_CODE = 102;
+
+    //Danh sách yêu cầu quyền
     private String[] videoCameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    //link video sau khi upload
     private Uri videoUri;
+
+    //Tiến trình hiển thị khi upload
     private ProgressDialog videoProgressDialog;
 
     @Override
+    //Hàm tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
@@ -342,9 +359,12 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
                 });
     }
 
+    //Hàm yêu cầu quyền Video, camera
     private void Video_RequestCameraPermission() {
         ActivityCompat.requestPermissions(this, videoCameraPermissions, VIDEO_CAMERA_REQUEST_CODE);
     }
+
+    //Hàm yêu cầu quyền camera
     private void RequestCameraPermission() {
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         ActivityCompat.requestPermissions(this, cameraPermissions, CAMERA_REQUEST_CODE);
@@ -366,6 +386,8 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
             Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
     }*/
+
+    //hàm lưu hình ảnh
     private void saveImage(Bitmap bitmap){
         OutputStream fos;
         try {
@@ -385,6 +407,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     }
 
 
+    //Hàm kiểm tra quyền
     private boolean CheckCameraPermission() {
         boolean r1 = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
         boolean r2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED;
@@ -400,6 +423,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     }*/
 
 
+    //hàm cập nhật trạng thái xem tin nhắn
     private void seenMessage(final String userId){
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
@@ -433,6 +457,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
 
     }
 
+    //Hàm gửi tin nhắn
     private void sendMessage(Chat chat){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
@@ -487,6 +512,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         });
     }
 
+    //Hàm load tin nhắn trong boox chat
     private void readMessages(String myId, String userId, String imageURL){
         chatList = new ArrayList<>();
 
@@ -515,6 +541,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         });
     }
 
+    //hàm cập nhật trạng thái online
     private void status(String status){
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -524,25 +551,28 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     }
 
     @Override
+    //Tuỳ chỉnh hàm onResume để cập nhật trạng thái online
     protected void onResume() {
         super.onResume();
         status("online");
     }
 
     @Override
+    //Tuỳ chỉnh hàm onPause để cập nhật trạng thái online
     protected void onPause() {
         super.onPause();
         reference.removeEventListener(seenListener);
         status("offline");
     }
 
-
+    //Hàm lấy phần mở rộng của file bằng uri
     private String getFileExtension(Uri uri){
         ContentResolver contentResolver = this.getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
+    //Hàm upload ảnh lên firebase
     private void uploadImage() {
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
@@ -615,6 +645,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         }
     }
 
+    //Hàm lưu thông tin ảnh
     private void saveInfoImage(Image image){
 
         DatabaseReference audioRef = FirebaseDatabase.getInstance().getReference("ImageList")
@@ -650,16 +681,19 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
     }
 
     @Override
+    //Hàm thực thi khi task lấy thông tin thời gian xoá tài nguyên xảy ra
     public void getTimelineOK() {
         this.refresh = true;
     }
 
     @Override
+    //Hàm thực thi khi task xoá tài nguyên hoàn thành
     public void releaseFinish() {
         this.refresh = false;
     }
 
     @Override
+    //Yêu cầu quyền và kiểm tra quyền video, camera
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case VIDEO_CAMERA_REQUEST_CODE:
@@ -675,6 +709,7 @@ public class MessageActivity extends AppCompatActivity implements IReleaseStorag
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    //Upload video lên firebase
     private void Video_UploadToFirebase() {
         videoProgressDialog.show();
         String fileName = String.format("video%d", System.currentTimeMillis());

@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -47,32 +46,32 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import hcmute.edu.vn.zalo_04.model.Audio;
 import hcmute.edu.vn.zalo_04.model.Chat;
 import hcmute.edu.vn.zalo_04.util.TimeUtil;
 
 public class SendAudioActivity extends AppCompatActivity {
-    Button buttonStart, buttonStop, buttonPlayLastRecordAudio,
-            buttonStopPlayingRecording, btn_pick_audio ;
-    String AudioSavePathInDevice = null;
-    MediaRecorder mediaRecorder ;
-    Random random ;
-    String RandomAudioFileName = "ABCDEFGHIJKLMNOP";
-    public static final int RequestPermissionCode = 1;
-    MediaPlayer mediaPlayer ;
-    private FirebaseDatabase db;
-    private DatabaseReference reference;
-    private StorageReference storageReference;
-    FirebaseStorage storage;
+    //Casc nút tương tác với audio, ghi, dừng ghi, phát, dừng phát, chọn audio từ thư viện (không dùng tới)
+    private Button buttonStart, buttonStop, buttonPlayLastRecordAudio,
+            buttonStopPlayingRecording, btn_send_audio;
+    private String AudioSavePathInDevice = null; //Đường dẫn file audio từ thiết bị (Không dùng tới)
+    private MediaRecorder mediaRecorder ; //trình ghi âm
+    private Random random ; //Biến ngầu nhiên (tạo tên)
+    private String RandomAudioFileName = "ABCDEFGHIJKLMNOP"; //Ký tự ngẫu nhiên để tạo tên
+    public static final int RequestPermissionCode = 1; // Mã yêu cầu quyền
+    private MediaPlayer mediaPlayer ; //Trình phát audio
+    private FirebaseDatabase db; //Khai báo liên kết Database
+    private DatabaseReference reference; //Biến tham chiếu Database
+    private StorageReference storageReference; //Tham chiếu Storage trên firebase
 
-    private Uri download;
+    private Uri download; //link audio
 
-    private FirebaseUser firebaseUser;
-    private String userId;
+    private FirebaseUser firebaseUser; //Biến lưu người dùng hiện tại
+    private String userId; //Biến lưu id tài khoản chat cùng
 
     @Override
+    //Khỏi tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_audio);
@@ -80,9 +79,9 @@ public class SendAudioActivity extends AppCompatActivity {
         buttonStop = (Button) findViewById(R.id.button2);
         buttonPlayLastRecordAudio = (Button) findViewById(R.id.button3);
         buttonStopPlayingRecording = (Button)findViewById(R.id.button4);
-        btn_pick_audio = (Button) findViewById(R.id.btn_pick_audio);
+        btn_send_audio = (Button) findViewById(R.id.btn_pick_audio);
 
-        btn_pick_audio.setEnabled(false);
+        btn_send_audio.setEnabled(false);
         buttonStop.setEnabled(false);
         buttonPlayLastRecordAudio.setEnabled(false);
         buttonStopPlayingRecording.setEnabled(false);
@@ -151,13 +150,10 @@ public class SendAudioActivity extends AppCompatActivity {
                 buttonPlayLastRecordAudio.setEnabled(true);
                 buttonStart.setEnabled(true);
                 buttonStopPlayingRecording.setEnabled(false);
-                btn_pick_audio.setEnabled(true);
+                btn_send_audio.setEnabled(true);
 
                 Toast.makeText(SendAudioActivity.this, "Recording Completed",
                         Toast.LENGTH_LONG).show();
-
-
-
             }
         });
 
@@ -201,7 +197,7 @@ public class SendAudioActivity extends AppCompatActivity {
 
         });
 
-        btn_pick_audio.setOnClickListener(View -> {
+        btn_send_audio.setOnClickListener(View -> {
             upLoad();
             //onClickSendAudio();
 
@@ -209,7 +205,7 @@ public class SendAudioActivity extends AppCompatActivity {
 
     }
 
-    private void onClickSendAudio() {
+    /*private void onClickSendAudio() {
 
         Intent intent = new Intent(this, MessageActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Bundle bundle = new Bundle();
@@ -217,8 +213,9 @@ public class SendAudioActivity extends AppCompatActivity {
         intent.putExtras(bundle);
         this.startActivity(intent);
 
-    }
+    }*/
 
+    //Chuẩn bị trình ghi âm
     public void MediaRecorderReady(){
         mediaRecorder=new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -227,6 +224,7 @@ public class SendAudioActivity extends AppCompatActivity {
         mediaRecorder.setOutputFile(getFilePath());
     }
 
+    //Tạo tên file ngẫu nhiên
     public String CreateRandomAudioFileName(int string){
         StringBuilder stringBuilder = new StringBuilder( string );
         int i = 0 ;
@@ -239,12 +237,14 @@ public class SendAudioActivity extends AppCompatActivity {
         return stringBuilder.toString();
     }
 
+    //yêu cầu quyền truy cập kho lưu trữ trên thiết bị
     @RequiresApi(api = Build.VERSION_CODES.R)
     private void requestPermission() {
         ActivityCompat.requestPermissions(SendAudioActivity.this, new
                 String[]{WRITE_EXTERNAL_STORAGE, RECORD_AUDIO, READ_EXTERNAL_STORAGE}, RequestPermissionCode);//, WRITE_EXTERNAL_STORAGE
     }
 
+    //Kiểm tra cấp quyền
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -270,6 +270,7 @@ public class SendAudioActivity extends AppCompatActivity {
         }
     }
 
+    //Kiểm tra cấp quyền
     @RequiresApi(api = Build.VERSION_CODES.R)
     public boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(),
@@ -284,12 +285,15 @@ public class SendAudioActivity extends AppCompatActivity {
                 result2 == PackageManager.PERMISSION_GRANTED;
     }
 
+    //Lấy đường dẫn file
     private String getFilePath(){
         ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
         File recordAudio = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
         File file = new File(recordAudio,"AudioRecording.3gp");
         return file.getPath();
     }
+
+    //Upload  audio lên firebase
     private void upLoad(){
         String downloadLink = "";
         /*final DatabaseReference reference = FirebaseDatabase.getInstance(
@@ -348,12 +352,13 @@ public class SendAudioActivity extends AppCompatActivity {
         });
     }
 
-    private String getFileExtension(Uri uri){
+   /* private String getFileExtension(Uri uri){
         ContentResolver contentResolver = this.getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
-    }
+    }*/
 
+    //Gửi tin nhắn dạng audio
     private void sendMessage(Chat chat){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 

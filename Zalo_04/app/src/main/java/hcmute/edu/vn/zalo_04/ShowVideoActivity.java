@@ -10,14 +10,16 @@ import android.widget.VideoView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+//Activity phát video trong boxchat
 public class ShowVideoActivity extends AppCompatActivity {
 //    private ActionBar actionBar;
-    private VideoView videoView;
+    private VideoView videoView; //View phát video
 
-    private Uri videoUri;
-    private String videoUrl;
+    private Uri videoUri; //Linh video dạng uri
+    private String videoUrl; //Link video dạng String
 
     @Override
+    //hàm khởi tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_video);
@@ -40,6 +42,7 @@ public class ShowVideoActivity extends AppCompatActivity {
         }
     }
 
+    //Hàm cài đặt chạy video trong view
     private void SetVideoToVideoView() {
         MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);

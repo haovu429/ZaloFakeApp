@@ -21,20 +21,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+//activity player audio
 public class PlayAudioActivity extends AppCompatActivity {
-    private TextView title, time;
-    private Button btn_pick_file, btn_play, btn_exit;
-    private String duration;
-    private SeekBar progress;
+    private TextView title, time; // Hiển thị tiêu đề audio, lỗi, thời gian chạy audio
+    private Button btn_pick_file, btn_play, btn_exit; // nút chọn file (không dùng tới), nút chạy audio và nút thoát activity
+    private String duration; //Biến lưu thời lượng video
+    private SeekBar progress; //Thanh tiến trình chạy audio
 
-    private MediaPlayer mediaPlayer;
-    private ScheduledExecutorService timer;
+    private MediaPlayer mediaPlayer; //trình phát audip
+    private ScheduledExecutorService timer; //Biến kiểm soát thời gian chạy audio
 
-    private ActivityResultLauncher<String> pick_audio;
+    private ActivityResultLauncher<String> pick_audio;//Sự kiện chọn một file audio để phát (Không sử dụng tới)
 
-    private String audioUrl;
+    private String audioUrl; //Link audio tư firebase để phát
 
     @Override
+    //Hàm toạ giao dieện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_audio);
@@ -47,7 +49,7 @@ public class PlayAudioActivity extends AppCompatActivity {
         btn_exit = findViewById(R.id.btn_exit);
 
         Bundle bundle = getIntent().getExtras();
-
+        //Lấy link audio được truyền từ MessageActivity qua
         if (bundle != null){
             this.audioUrl = (String) bundle.get("audioUrl");
             if(this.audioUrl == null){
@@ -140,6 +142,7 @@ public class PlayAudioActivity extends AppCompatActivity {
 
     }
 
+    //Hàm tạo trình phát
     private void createMediaPlayer(Uri uri) {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioAttributes(
@@ -183,7 +186,7 @@ public class PlayAudioActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("Range")
+/*    @SuppressLint("Range")
     private String getNameFromUri(Uri uri) {
         String fileName = "";
         Cursor cursor = null;
@@ -200,9 +203,9 @@ public class PlayAudioActivity extends AppCompatActivity {
         }
 
         return fileName;
-    }
+    }*/
 
-
+    //Hàm giải phóng trình phát
     public void releaseMediaPlayer(){
         if (time != null) {
             timer.shutdown();

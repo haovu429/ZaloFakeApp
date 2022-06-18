@@ -9,13 +9,17 @@ import android.widget.Button;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+//Activity bắt đầu ứng dụng
 public class StartActivity extends AppCompatActivity {
 
+    //Nút lựa chọn đăng nhập, đăng ký
     Button btn_login, btn_register;
 
+    //Biến lưu người người dùng hiện tại nếu đã đăng nhập trước đó
     FirebaseUser firebaseUser;
 
     @Override
+    //Hàm kiêm tra xem đã có người dùng đăng nhập trước đó hay chưa
     protected void onStart() {
         super.onStart();
 
@@ -30,6 +34,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     @Override
+    //hàm khởi tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);

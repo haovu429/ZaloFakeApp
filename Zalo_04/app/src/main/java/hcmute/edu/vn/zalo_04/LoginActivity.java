@@ -17,15 +17,17 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+
 public class LoginActivity extends AppCompatActivity {
 
-    private MaterialEditText email, password;
-    private Button btn_login;
+    private MaterialEditText email, password; // Editxext nhập thông tin
+    private Button btn_login; //Nút Login
 
-    private FirebaseAuth auth;
-    private TextView forgot_password;
+    private FirebaseAuth auth; //Lấy quyền tuwf Firebase
+    private TextView forgot_password; //Chức năng quên mật khẩu
 
     @Override
+    //Tạo view
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);

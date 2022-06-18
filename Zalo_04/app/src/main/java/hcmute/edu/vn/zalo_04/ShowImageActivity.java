@@ -9,10 +9,11 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+//Activity show hình ảnh trong boxchat
 public class ShowImageActivity extends AppCompatActivity {
 
-    private ImageView image_sent;
-    private String imageUrl;
+    private ImageView image_sent; //View hiển thị hình ảnh
+    private String imageUrl; // Link hình ảnh
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

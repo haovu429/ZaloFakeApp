@@ -16,11 +16,12 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
-    private MaterialEditText send_email;
-    private Button btn_reset;
-    private FirebaseAuth firebaseAuth;
+    private MaterialEditText send_email; //Text box nhập email
+    private Button btn_reset; //Nút reset
+    private FirebaseAuth firebaseAuth; //Biến quản lý quyền người dùng từ firebase
 
     @Override
+    //Khởi tạo giao diện
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+//Activity chụp ảnh (Chưa dùng tới)
 public class TakePhotoActivity extends AppCompatActivity {
 
     @Override
